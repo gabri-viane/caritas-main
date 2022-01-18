@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.layout.HBox?>
+
+<fx:root maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" type="HBox" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <RadioButton fx:id="toggleBTN" mnemonicParsing="false">
+         <graphic>
+            <HBox fx:id="containerHB" />
+         </graphic>
+      </RadioButton>
+   </children>
+</fx:root>
