@@ -23,9 +23,9 @@ import ttt.utils.xml.engine.annotations.Element;
  * @author gabri
  */
 @Element(Name = "root")
-public class PluginData extends XMLElement{
+public class PluginAmbientElement extends XMLElement{
     
-    public PluginData() {
+    public PluginAmbientElement() {
         super("root");
     }
     

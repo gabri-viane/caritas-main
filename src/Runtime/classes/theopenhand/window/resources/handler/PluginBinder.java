@@ -24,6 +24,9 @@ import theopenhand.window.resources.ui.OptionGroup;
 import theopenhand.window.resources.ui.PluginOptionButton;
 
 /**
+ * Associa ad ogni plugin caricato il proprio {@link PluginOptionButton} e lo
+ * mette nel gruppo laterale corrispondente, e nel caso non esistesse, crea
+ * anche il gruppo.
  *
  * @author gabri
  */
@@ -36,7 +39,8 @@ public class PluginBinder {
     }
 
     /**
-     *
+     * Carica tutti i plugin iscritti al {@link SubscriptionHandler} e ne crea i
+     * relativi pulsanti.
      */
     public static void loadAll() {
         SubscriptionHandler.getPluginReferences().forEach(rf -> {
@@ -45,11 +49,13 @@ public class PluginBinder {
     }
 
     /**
+     * Carica una singola {@link RuntimeReference} e ne crea i pulsanti di
+     * accesso se non è ancora stata caricta.
      *
-     * @param rf
+     * @param rf La {@link RuntimeReference} da caricare.
      */
     public static void load(RuntimeReference rf) {
-        if (rf != null) {
+        if (rf != null && !subscribed.containsKey(rf)) {
             HashMap<String, ArrayList<PluginOptionButton>> hm = new HashMap<>();
             rf.getPluginReferenceControllers().forEach(rc -> {
                 PluginOptionButton plbtn = new PluginOptionButton(rf, rc.getAssocButtonName());
@@ -81,20 +87,26 @@ public class PluginBinder {
     }
 
     /**
+     * Registra un nuovo gruppo per i pulsanti di accesso se non ne esiste già
+     * uno con lo stesso nome.
      *
-     * @param name
-     * @param ogcntrl
+     * @param name Nome del nuovo gruppo.
+     * @param ogcntrl Gruppo da aggiungere.
      */
     public static void registerNew(String name, OptionGroup ogcntrl) {
-        StaticReferences.getMainWindowReference().addLateralTitledPane(ogcntrl);
-        opts.put(name, ogcntrl);
+        if (!opts.containsKey(name)) {
+            StaticReferences.getMainWindowReference().addLateralTitledPane(ogcntrl);
+            opts.put(name, ogcntrl);
+        }
     }
 
     /**
+     * Rimuove tutti i pulsanti di una {@link RuntimeReference} dai gruppi in
+     * cui è stata aggiunta.
      *
-     * @param to_remove
+     * @param to_remove valore da cercare e rimuovere.
      */
-    public static void unregister(RuntimeReference to_remove) {
+    private static void unregister(RuntimeReference to_remove) {
         HashMap<String, ArrayList<PluginOptionButton>> get = subscribed.get(to_remove);
         if (get != null) {
             get.entrySet().stream().forEach((t) -> {
@@ -105,8 +117,11 @@ public class PluginBinder {
     }
 
     /**
+     * Rimuove una {@link RuntimeReference} da tutti i pannelli e dalla
+     * sottoscrizione di questo binder.
      *
-     * @param to_remove
+     * @param to_remove {@link RuntimeReference} per cui cercare i pulsanti di
+     * accesso da rimuovere.
      */
     public static void unload(RuntimeReference to_remove) {
         if (to_remove != null) {

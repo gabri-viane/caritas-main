@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.installer.plugins;
+package theopenhand.installer.online;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import theopenhand.installer.plugins.store.PluginData;
+import java.util.UUID;
+import theopenhand.installer.online.store.PluginDownloadData;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.Alert;
 import theopenhand.installer.SetupInit;
-import theopenhand.installer.plugins.store.PluginStore;
+import theopenhand.installer.online.store.PluginStore;
 import theopenhand.installer.utils.WebConnection;
 import theopenhand.installer.utils.WebConnection.DownloadTask;
 import theopenhand.window.graphics.dialogs.DialogCreator;
@@ -38,6 +39,9 @@ public class WebsiteComplement {
     private static final String VIEW_PLUGIN_STORE = "https://vnl-eng.net/sections/TCE/ncdb/store/store.php?t=1";
     private static final String VIEW_PLUGIN_DESCRIPTION_STORE = "https://vnl-eng.net/sections/TCE/ncdb/store/store.php?t=2&d=";
     private static final String DOWNLOAD_PLUGIN = "https://vnl-eng.net/sections/TCE/ncdb/store/";
+    private static final String VIEW_VERSION_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/";
+    private static final String DOWNLOAD_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/";
+    private static final String DOWNLOAD_OUTER_HAND = "https://vnl-eng.net/sections/TCE/ncdb/program/";
 
     public WebsiteComplement() {
     }
@@ -49,13 +53,23 @@ public class WebsiteComplement {
                 JsonObject arr2 = (JsonObject) JsonParser.parseString(s);
                 arr2.entrySet().forEach(e -> {
                     JsonObject jo = e.getValue().getAsJsonObject();
-                    PluginData pd = new PluginData();
+                    PluginDownloadData pd = new PluginDownloadData();
                     pd.setUuid(e.getKey());
                     pd.setDownload_path(jo.getAsJsonPrimitive("down_path").getAsString());
                     pd.setName(jo.getAsJsonPrimitive("pknm").getAsString());
                     pd.setZip_path(jo.getAsJsonPrimitive("zip_path").getAsString());
                     pd.setInj_point(jo.getAsJsonPrimitive("injnm").getAsString());
                     pd.setVersion(jo.getAsJsonPrimitive("ver").getAsInt());
+                    if (jo.has("req")) {
+                        jo.getAsJsonArray("req").forEach(je -> {
+                            pd.addRequires(UUID.fromString(je.getAsString()));
+                        });
+                    }
+                    if (jo.has("lib")) {
+                        jo.getAsJsonArray("lib").forEach(je -> {
+                            pd.addLibrary(UUID.fromString(je.getAsString()));
+                        });
+                    }
                     ps.addPlugin(pd);
                 });
             } else {
@@ -67,7 +81,7 @@ public class WebsiteComplement {
         }
     }
 
-    public void sendDescriptionRequest(PluginData pd) {
+    public void sendDescriptionRequest(PluginDownloadData pd) {
         String s = WebConnection.comunicate(VIEW_PLUGIN_DESCRIPTION_STORE + pd.getUuid().toString(), "");
         if (s != null) {
             try {
@@ -82,7 +96,12 @@ public class WebsiteComplement {
         }
     }
 
-    public DownloadTask sendDownloadRequest(PluginData pd) {
+    public DownloadTask sendDownloadRequest(PluginDownloadData pd) {
         return new DownloadTask(DOWNLOAD_PLUGIN + pd.getDownload_path(), pd.getName(), SetupInit.getInstance().getDOWNLOAD_FOLDER());
+    }
+
+    public long sendVersionRequest() {
+
+        return 0;
     }
 }

@@ -41,8 +41,10 @@ public final class EngineBuilder {
 
     public void removeConnectionEngine(Class<? extends BindableResult> clz) {
         ConnectionEngine<?, ?> remove = engines.remove(clz);
-        remove.getHolderInstance().clearResults();
-        remove.close();
+        if (remove != null) {
+            remove.getHolderInstance().clearResults();
+            remove.close();
+        }
     }
 
 }

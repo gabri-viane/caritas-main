@@ -29,6 +29,13 @@ import theopenhand.window.objects.TextFieldBuilder;
 import theopenhand.window.resources.ui.settings.plugins.PluginSettingField;
 
 /**
+ * Carica le impostazioni di un plugin.
+ * <p/>
+ * Data la {@link LinkableClass} viene chiamato il metodo {@link LinkableClass#getSettings()
+ * } e vengono cercati tutti i campi con l'annotazione {@link SettingProperty}.
+ * <br/>
+ * Questa classe si occupa di chiamare il metodo {@link Settings#setUUID(theopenhand.runtime.block.KeyUnlock, java.util.UUID)
+ * } che assegna l'UUID al plugin.
  *
  * @author gabri
  */
@@ -102,7 +109,8 @@ public class SettingsLoader {
     }
 
     /**
-     *
+     * Rigenera gli elementi grafici associati al campo della proprietà della
+     * classe {@link Settings} del plugin.
      */
     public void createNodes() {
         controls.clear();
@@ -189,16 +197,20 @@ public class SettingsLoader {
     }
 
     /**
+     * Ritorna la lista di elementi grafici generati ed associati ai fields
+     * delle proprietà.
      *
-     * @return
+     * @return La lista di impostazioni grafiche.
      */
     public ArrayList<PluginSettingField> getNodes() {
         return controls;
     }
 
     /**
+     * Ritorna la classe di caricamento principale del plugin
+     * {@link LinkableClass}
      *
-     * @return
+     * @return La classe entry-point del plugin
      */
     public LinkableClass getLinkableClass() {
         return lc;

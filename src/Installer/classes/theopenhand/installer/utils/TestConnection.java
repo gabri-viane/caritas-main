@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
-import theopenhand.installer.data.ProgrammData;
 
 /**
  *
@@ -30,7 +29,7 @@ public class TestConnection {
 
     public static boolean isOnline() {
         try {
-            String con = ProgrammData.getInstance().getDatabaseURL().split(":",2)[0];            
+            String con = "";//ProgrammData.getInstance().getDatabaseURL().split(":",2)[0];            
             InetAddress add=InetAddress.getByName(con);
             
             for(int i = 0;i<3;i++){

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 gabri.
+ * Copyright 2022 gabri.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.runtime.loader.folder.xml;
-
-import ttt.utils.xml.document.XMLElement;
-import ttt.utils.xml.engine.annotations.Element;
+package theopenhand.commons.events.programm;
 
 /**
  *
  * @author gabri
+ * @param <T>
  */
-@Element(Name = "plugins", CanHaveValue = false, CanHaveTags = false)
-public class PluginsElement extends XMLElement {
+public interface OpExecutor<T> {
 
-    public PluginsElement() {
-        super("plugins");
-    }
-
+    public T onCall();
 }

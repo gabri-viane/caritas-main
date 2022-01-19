@@ -15,20 +15,47 @@
  */
 package theopenhand.runtime.loader.folder.xml;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import theopenhand.runtime.loader.folder.PluginFolderHandler;
 import ttt.utils.engines.enums.FieldType;
+import ttt.utils.engines.enums.MethodType;
 import ttt.utils.engines.interfaces.EngineField;
+import ttt.utils.engines.interfaces.EngineMethod;
 import ttt.utils.xml.document.XMLElement;
 import ttt.utils.xml.engine.annotations.Element;
 import ttt.utils.xml.engine.annotations.Tag;
 
 /**
+ * Viene caricato all'avvio del programma e esiste solo quando il plugin è già
+ * installato.
+ * <p>
+ * Contiene i dati relativi a:
+ * <ul>
+ * <li>Percorso al file .jar</li>
+ * <li>Percorso alla classe di caricamento</li>
+ * <li>Il nome del plugin</li>
+ * <li>L'UUID associato al plugin</li>
+ * <li>Lista di UUID di plugins da cui dipende</li>
+ * </ul>
+ *
+ * Viene usato solo al caricamento e alla scrittura del file di
+ * {@link SetupInit#PLUGINS_XML} , mentre viene aggiornato ogni volta che viene installato
+ * un plugin.
+ *<br>
+ * Un plugin appena installato avrà il relativo {@link PluginLoaderElement}
+ * registrato, solo dopo aver chiamato {@link PluginFolderHandler#addPluginData(java.io.File, java.lang.String, java.lang.String, java.lang.String)
+ * } o simile.
  *
  * @author gabri
  */
 @Element(Name = "plugin")
-public class PluginElement extends XMLElement {
+public class PluginLoaderElement extends XMLElement {
+
+    private final LinkedList<UUID> deps;
 
     @EngineField(FieldType = FieldType.READ_AND_WRITE)
     @Tag(Name = "file")
@@ -50,26 +77,29 @@ public class PluginElement extends XMLElement {
     @Tag(Name = "ver")
     private String version;
 
-    public PluginElement() {
+    public PluginLoaderElement() {
         super("plugin");
+        deps = new LinkedList<>();
     }
 
-    public PluginElement(String file_path, String name, String class_path, String version, String uuid) {
+    public PluginLoaderElement(String file_path, String name, String class_path, String version, String uuid) {
         super("plugin");
         this.file_path = file_path;
         this.class_path = class_path;
         this.uuid = uuid;
         this.plugin_name = name;
-        this.version =version;
+        this.version = version;
+        deps = new LinkedList<>();
     }
 
-    public PluginElement(String file_path, String name, String class_path, String version, UUID uuid) {
+    public PluginLoaderElement(String file_path, String name, String class_path, String version, UUID uuid) {
         super("plugin");
         this.file_path = file_path;
         this.class_path = class_path;
         this.uuid = uuid.toString();
         this.plugin_name = name;
-        this.version =version;
+        this.version = version;
+        deps = new LinkedList<>();
     }
 
     public String getFile_path() {
@@ -120,9 +150,36 @@ public class PluginElement extends XMLElement {
         this.version = version;
     }
 
+    @EngineMethod(MethodType = MethodType.CALC)
+    public void generateDependencies() {
+        getElements().forEach(el -> {
+            deps.add(UUID.fromString(el.getValue()));
+        });
+    }
+
+    public List<UUID> getDependencies() {
+        return Collections.unmodifiableList(deps);
+    }
+
+    public void addDependencies(UUID el) {
+        DependsElement de = new DependsElement();
+        de.setValue(el.toString());
+        addSubElement(de);
+        deps.add(el);
+    }
+
+    public void addDependencies(List<UUID> els) {
+        els.forEach(el -> {
+            DependsElement de = new DependsElement();
+            de.setValue(el.toString());
+            addSubElement(de);
+            deps.add(el);
+        });
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof PluginElement pe) {
+        if (obj instanceof PluginLoaderElement pe) {
             return pe.uuid.equals(uuid);
         }
         return false;

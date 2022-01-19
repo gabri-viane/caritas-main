@@ -57,7 +57,7 @@ public class DBResultLoader {
         SubscriptionHandler.addListener(new ListEventListener<RuntimeReference>() {
             @Override
             public void onElementAdded(RuntimeReference element) {
-                
+
             }
 
             @Override
@@ -97,8 +97,18 @@ public class DBResultLoader {
     }
 
     /**
+     * Data un {@link RuntimeReference} prende l'istanza di
+     * {@link EngineBuilder} e richiede tutte le {@link BindableResult}
+     * sottoscritte al caricamento da questa <i>Reference</i>.
+     * <br>
+     * Successivamente rimuove tutti i {@link ConnectionEngine} associati alle
+     * classi registrate.
+     * <br>
+     * Infine viene chiamata la funzione {@link PluginBinder#unload(theopenhand.runtime.templates.RuntimeReference)
+     * }.
      *
-     * @param rr
+     * @param rr La {@link RuntimeReference} da scaricare (disattivare per la
+     * sessione corrente).
      */
     public void unload(RuntimeReference rr) {
         EngineBuilder eb = EngineBuilder.getInstance();

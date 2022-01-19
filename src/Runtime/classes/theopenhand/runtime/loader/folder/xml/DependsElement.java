@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.installer.data;
+package theopenhand.runtime.loader.folder.xml;
+
+import java.util.UUID;
+import ttt.utils.xml.document.XMLElement;
+import ttt.utils.xml.engine.annotations.Element;
 
 /**
+ * Elemento che rappresenta una dipendenza di un plugin ad un'altro tramite
+ * UUID. Questo elemento contiene il valore UUID relativo all'plugin da cui
+ * dipende.
  *
  * @author gabri
  */
-public class ProgrammData {
-    
-    private static ProgrammData instance;
+@Element(Name = "depends", CanHaveTags = false)
+public class DependsElement extends XMLElement {
 
-    private ProgrammData(){
+    public DependsElement() {
+        super("depends");
     }
-    
-    public static ProgrammData getInstance() {
-        if (instance == null) {
-            instance = new ProgrammData();
-        }
-        return instance;
+
+    public UUID getUUID() {
+        return UUID.fromString(getValue());
     }
-    
 
 }

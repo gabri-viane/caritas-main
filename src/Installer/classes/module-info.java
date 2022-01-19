@@ -24,7 +24,7 @@ module Installer {
     
     exports theopenhand.installer;
     exports theopenhand.installer.data;
-    exports theopenhand.installer.plugins.store;
+    exports theopenhand.installer.online.store;
     exports theopenhand.installer.utils;
     opens theopenhand.installer.utils to javafx.graphics;
 }

@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.UUID;
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import theopenhand.installer.SetupInit;
+import theopenhand.installer.online.store.PluginDownloadData;
 
 /**
  *
@@ -55,10 +57,63 @@ public class Installer {
     }
 
     /**
+     * Installa un plugin:
+     * <ol>
+     * <li>Apre il file zip (pasato all'istanza tramite {@link #generate(java.io.File)
+     * })</li>
+     * <li>Controlla che contenga il file .jar</li>
+     * <li>Usa i dati scaricati dal sito tramite {@link PluginDownloadData}</li>
+     * <li>Tramite {@link PluginFolderHandler#addPluginData(java.io.File, java.lang.String, java.lang.String, java.lang.String, java.util.UUID, java.util.ArrayList)
+     * } registra il plugin per il prossimo caricamento.</li>
+     * </ol>
+     * Questo metodo suppone che il {@link PluginDownloadData} passato
+     * corrisponda al file con cui è stata generata questa istanza.
      *
-     * @return
+     * @param pd I dati del plugin
+     * @return {@code true} se l'installazione avviene con successo.
      */
-    public boolean install() {
+    public boolean installFrom(PluginDownloadData pd) {
+        try {
+            ZipFile file = new ZipFile(to_install);
+            Iterator<? extends ZipEntry> asIterator = file.entries().asIterator();
+            boolean jar_found = false;
+            ZipEntry to_extract = null;
+            while (asIterator.hasNext() && !jar_found) {
+                ZipEntry entry = asIterator.next();
+                if (!entry.isDirectory()) {
+                    var name = entry.getName();
+                    if (name.endsWith(".jar")) {
+                        to_extract = entry;
+                        jar_found = true;
+                    }
+                }
+            }
+            if (to_extract != null) {
+                Path newPath = zipSlipProtect(to_extract, SetupInit.getInstance().getPLUGINS_FOLDER().toPath());
+                Files.copy(file.getInputStream(to_extract), newPath, StandardCopyOption.REPLACE_EXISTING);
+                if (pd != null) {
+                    PluginFolderHandler.getInstance().addPluginData(newPath.toFile(), pd.getName(), pd.getInj_point(), pd.getVersion().toString(), pd.getUuid(), pd.getRequires());
+                    file.close();
+                    return true;
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Installer.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * A differenza di {@link #installFrom(theopenhand.installer.online.store.PluginDownloadData)
+     * }, questo metodo estra i dati del plugin direttamente dal file
+     * {@code .properties} teoricamente contenuto nel file zip del plugin.
+     * <br>
+     * Pre tutto il resto si comporta esattamente come l'altro metodo.
+     *
+     * @return {@code true} se l'installazione avviene con successo.
+     */
+    public boolean installZipComplete() {
         try {
             ZipFile file = new ZipFile(to_install);
             Iterator<? extends ZipEntry> asIterator = file.entries().asIterator();
@@ -89,9 +144,17 @@ public class Installer {
                 String injnm = p.getProperty("injnm");
                 String uid = p.getProperty("uuid", null);
                 String ver = p.getProperty("ver", "1");
+                String req = p.getProperty("req");
+                ArrayList<UUID> uids = new ArrayList<>();
+                if (req != null) {
+                    String[] reqs = req.split(",");
+                    for (String s : reqs) {
+                        uids.add(UUID.fromString(s));
+                    }
+                }
                 if (pknm != null && injnm != null && !pknm.isBlank() && !injnm.isBlank()) {
                     if (uid != null && !uid.isBlank()) {
-                        PluginFolderHandler.getInstance().addPluginData(newPath.toFile(), pknm, injnm, ver, UUID.fromString(uid));
+                        PluginFolderHandler.getInstance().addPluginData(newPath.toFile(), pknm, injnm, ver, UUID.fromString(uid), uids);
                     } else {
                         PluginFolderHandler.getInstance().addPluginData(newPath.toFile(), pknm, injnm, ver);
                     }
@@ -105,7 +168,7 @@ public class Installer {
         }
         return false;
     }
-    
+
     private static Path zipSlipProtect(ZipEntry zipEntry, Path targetDir) throws IOException {
         Path targetDirResolved = targetDir.resolve(zipEntry.getName());
         Path normalizePath = targetDirResolved.normalize();

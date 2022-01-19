@@ -13,16 +13,21 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import theopenhand.commons.Pair;
+import theopenhand.commons.connection.runtime.interfaces.BindableResult;
+import theopenhand.commons.events.programm.OpExecutor;
 import theopenhand.commons.events.programm.utils.ListEventListener;
+import theopenhand.installer.SetupInit;
 import theopenhand.runtime.SubscriptionHandler;
 import theopenhand.runtime.ambient.DataEnvironment;
+import theopenhand.runtime.ambient.PluginEnv;
 import theopenhand.runtime.loader.folder.PluginFolderHandler;
-import theopenhand.runtime.loader.folder.xml.PluginElement;
+import theopenhand.runtime.loader.folder.xml.PluginLoaderElement;
 import theopenhand.runtime.templates.LinkableClass;
 import theopenhand.runtime.templates.RuntimeReference;
 
@@ -37,8 +42,8 @@ public class Loader {
     private final HashMap<UUID, ArrayList<RuntimeReference>> loaded_references;
     private final HashMap<UUID, LinkableClass> loaded_classes;
     private final HashMap<UUID, SettingsLoader> loaded_settings;
-    private final HashMap<UUID, PluginElement> loaded_plugins;
-    private Pair<ArrayList<Pair<File, PluginElement>>, ArrayList<PluginElement>> readPluginData;
+    private final HashMap<UUID, PluginLoaderElement> loaded_plugins;
+    private Pair<ArrayList<Pair<File, PluginLoaderElement>>, ArrayList<PluginLoaderElement>> readPluginData;
 
     private final PluginFolderHandler pfh;
     private final DataEnvironment de;
@@ -79,7 +84,32 @@ public class Loader {
     }
 
     /**
-     *
+     * Quando viene chiamato seguono i seguenti passaggi:
+     * <ol>
+     * <li>Viene chiamato {@link PluginFolderHandler#readPluginData() } e il
+     * file {@link SetupInit#PLUGINS_XML} viene caricato.</li>
+     * <li>Vengono aggiunti tutti i file jar, contenuti nei
+     * {@link PluginLoaderElement} letti, al ClassLoader corrente.</li>
+     * <li>Per ogni {@link PluginLoaderElement} letto viene caricata la
+     * {@link LinkableClass} del plugin.</li>
+     * <ol>
+     * <li>Viene chiamato il costruttore della classe {@link LinkableClass}</li>
+     * <li>Viene chiamato il metodo {@link DataEnvironment#createEnv(theopenhand.runtime.templates.LinkableClass, java.util.UUID)
+     * }</li>
+     * <li>Viene chiamato il metodo {@link LinkableClass#load() } (in cui
+     * teoricamente il plugin aggiunge le {@link RuntimeReference} e tutte le
+     * {@link BindableResult} associate)</li>
+     * <li>Viene chiamato il metodo {@link PluginEnv#getSettingsLoader() } e
+     * salvato il risultato ({@link SettingsLoader})</li>
+     * </ol>
+     * </ol>
+     * Vengno perciò salvati per ogni plugin (associati al UUID):
+     * <ul>
+     * <li>{@link PluginLoaderElement}</li>
+     * <li>Un ArrayList di {@link RuntimeReference} registrate dal plugin</li>
+     * <li>{@link LinkableClass}</li>
+     * <li>{@link SettingsLoader} preso dal {@link PluginEnv} creato</li>
+     * </ul>
      */
     public void activate() {
         readPluginData = pfh.readPluginData();
@@ -88,7 +118,22 @@ public class Loader {
         DBResultLoader.getInstance();
     }
 
-    private void createClassLoader(ArrayList<Pair<File, PluginElement>> jar_files) {
+    public OpExecutor<Void> remove(UUID uid) {
+        return () -> {
+            var pid = findPlugin(uid);
+            pfh.removePluginData(uid);
+            List<UUID> requiredBy = pfh.getRequiredBy(uid);
+            if (requiredBy != null) {
+                requiredBy.forEach(uuid -> {
+                    remove(uuid).onCall();
+                });
+            }
+            new File(pid.getFile_path()).deleteOnExit();//TODO: Classe che segni che file sono da eliminare al prossimo avvio
+            return null;
+        };
+    }
+
+    private void createClassLoader(ArrayList<Pair<File, PluginLoaderElement>> jar_files) {
         URL[] arr = new URL[jar_files.size()];
         for (int i = 0; i < arr.length; i++) {
             try {
@@ -100,9 +145,9 @@ public class Loader {
         loader = URLClassLoader.newInstance(arr, getClass().getClassLoader());
     }
 
-    private void loadPlugin(Pair<File, PluginElement> p) {
+    private void loadPlugin(Pair<File, PluginLoaderElement> p) {
         try {
-            PluginElement pe = p.getValue();
+            PluginLoaderElement pe = p.getValue();
             Class<?> clazz = Class.forName(pe.getClass_path(), true, loader);
             Class<? extends LinkableClass> runClass = clazz.asSubclass(LinkableClass.class);
             Constructor<?> ctor = runClass.getConstructor();
@@ -169,7 +214,7 @@ public class Loader {
         return findPlugin(id).getVersion();
     }
 
-    private PluginElement findPlugin(UUID id) {
+    private PluginLoaderElement findPlugin(UUID id) {
         return loaded_plugins.get(id);
     }
 

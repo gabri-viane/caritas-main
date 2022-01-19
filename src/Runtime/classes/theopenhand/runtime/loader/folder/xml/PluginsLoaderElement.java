@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 gabri.
+ * Copyright 2021 gabri.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.installer.data;
+package theopenhand.runtime.loader.folder.xml;
+
+import ttt.utils.xml.document.XMLElement;
+import ttt.utils.xml.engine.annotations.Element;
 
 /**
+ * Root del file XML {@link SetupInit#PLUGINS_XML} che contiene la lista di
+ * plugins installati.<p/>
+ * Contiene una lista di elementi {@link PluginLoaderElement}.
  *
  * @author gabri
  */
-public class ProgrammData {
-    
-    private static ProgrammData instance;
+@Element(Name = "plugins", CanHaveValue = false, CanHaveTags = false)
+public class PluginsLoaderElement extends XMLElement {
 
-    private ProgrammData(){
+    public PluginsLoaderElement() {
+        super("plugins");
     }
-    
-    public static ProgrammData getInstance() {
-        if (instance == null) {
-            instance = new ProgrammData();
-        }
-        return instance;
-    }
-    
 
 }

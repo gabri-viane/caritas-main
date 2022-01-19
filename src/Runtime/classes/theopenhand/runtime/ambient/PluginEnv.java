@@ -15,7 +15,7 @@
  */
 package theopenhand.runtime.ambient;
 
-import theopenhand.runtime.ambient.xml.PluginData;
+import theopenhand.runtime.ambient.xml.PluginAmbientElement;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -46,7 +46,7 @@ public class PluginEnv {
     private final XMLWriter writer;
 
     private final XMLDocument written_data;
-    private PluginData pl;
+    private PluginAmbientElement pl;
     private SettingsFieldLoader fields_loader;
     private final File folder;
     private final File settings_file;
@@ -83,7 +83,7 @@ public class PluginEnv {
     }
 
     private void writeDefaultElements() {
-        pl = new PluginData();
+        pl = new PluginAmbientElement();
         pl.addSubElement(new SettingsElement());
         pl.addSubElement(new SavedDataElement());
         written_data.addSubElement(pl);
@@ -93,9 +93,9 @@ public class PluginEnv {
     private void finalizeElements() {
         if (settings_file.exists() && settings_file.isFile()) {
             try {
-                XMLEngine eng = new XMLEngine(settings_file, PluginData.class, SettingsElement.class, SavedDataElement.class, SavedElement.class, SettingField.class);
+                XMLEngine eng = new XMLEngine(settings_file, PluginAmbientElement.class, SettingsElement.class, SavedDataElement.class, SavedElement.class, SettingField.class);
                 eng.morph(written_data);
-                pl = (PluginData) written_data.getRoot();
+                pl = (PluginAmbientElement) written_data.getRoot();
             } catch (IOException ex) {
                 Logger.getLogger(PluginEnv.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -103,7 +103,7 @@ public class PluginEnv {
     }
 
     public void registerData(DataElement el) {
-        SavedDataElement savedData = ((PluginData) written_data.getRoot()).getSavedData();
+        SavedDataElement savedData = ((PluginAmbientElement) written_data.getRoot()).getSavedData();
         SavedElement se = new SavedElement();
         se.setPath_to_file(folder.getAbsolutePath() + File.separatorChar + el.getName());
         savedData.addSubElement(se);
@@ -161,7 +161,7 @@ public class PluginEnv {
         return folder;
     }
 
-    public PluginData getPluginData() {
+    public PluginAmbientElement getPluginData() {
         return pl;
     }
 

@@ -15,23 +15,18 @@
  */
 package theopenhand.installer.data;
 
+import java.io.Serializable;
+
 /**
  *
  * @author gabri
  */
-public class ProgrammData {
-    
-    private static ProgrammData instance;
+public class Version implements Serializable {
 
-    private ProgrammData(){
+    public static final Long serialVersionUID = 1L;
+
+    private Version() {
+
     }
-    
-    public static ProgrammData getInstance() {
-        if (instance == null) {
-            instance = new ProgrammData();
-        }
-        return instance;
-    }
-    
 
 }

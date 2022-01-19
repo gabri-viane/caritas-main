@@ -31,40 +31,34 @@ import theopenhand.window.resources.handler.PluginBinder;
  * @author gabri
  */
 public class TheOpenHand extends Application {
-    
+
     private void initSetup() {
-        //System.out.println(System.getProperty("user.dir"));
         /*try {
             Runtime.getRuntime().exec(new String[]{"cmd","/c",System.getProperty("user.dir")+File.separatorChar+"app"+File.separatorChar+"NCDB OuterHands.exe"});
         } catch (IOException ex) {
             Logger.getLogger(TheOpenHand.class.getName()).log(Level.SEVERE, null, ex);
         }*/
         SetupInit.getInstance();
-        //Installer.install(new File(ConsoleInput.getInstance().readString("Inserisci percorso file:"))).install();
     }
-    
+
     @Override
     public void start(Stage stage) {
-        
         initSetup();
-        
+
         MainReference mr = MainReference.getInstance();
         MainActivityCTRL activityCTRL = (MainActivityCTRL) mr.getRc();
-        
+
         StaticReferencesPvt.primaryStage = stage;
-        
+
         Scene s = mr.getScene();
         StaticReferences.setMAIN_WINDOW_SCENE(s);
         StaticReferences.setMAIN_WINDOW_EVENTS_HANDLER(new MainWindowEventsHandler(activityCTRL));
-        /*DatabaseConnection.IP = "127.0.0.1:3307/ncdb?serverTimezone=UTC";
-        DatabaseConnection.USER = "root";
-        DatabaseConnection.PASSWORD = "root";*/
         StaticReferences.dbconn = new DatabaseConnection();
         stage.setScene(s);
         stage.setTitle("TheOpenHand : Database Caritas");
         stage.getIcons().add(new Image(TheOpenHand.class.getResourceAsStream("/theopenhand/programm/resources/TheOpenHand-Icona Round.png")));
         stage.show();
-        
+
         s.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) -> {
             if (event.getCode() == KeyCode.F1) {
                 BorderPane mainContainerBP = activityCTRL.getMainContainerBP();
@@ -76,7 +70,7 @@ public class TheOpenHand extends Application {
                 event.consume();
             }
         });
-        
+
         if (StaticReferences.dbconn.isConnected()) {
             Loader l = Loader.getInstance();
             l.activate();
@@ -97,5 +91,5 @@ public class TheOpenHand extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
+
 }

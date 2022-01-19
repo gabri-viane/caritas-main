@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.installer.plugins.store;
+package theopenhand.installer.online.store;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import theopenhand.installer.plugins.WebsiteComplement;
+import theopenhand.installer.online.WebsiteComplement;
 import theopenhand.installer.utils.WebConnection;
 
 /**
@@ -28,7 +28,7 @@ import theopenhand.installer.utils.WebConnection;
  */
 public class PluginStore {
 
-    private final HashMap<UUID, PluginData> availables;
+    private final HashMap<UUID, PluginDownloadData> availables;
     private static PluginStore instance;
     private final WebsiteComplement wc;
 
@@ -49,25 +49,25 @@ public class PluginStore {
         return instance;
     }
 
-    public void addPlugin(PluginData pd) {
+    public void addPlugin(PluginDownloadData pd) {
         availables.put(pd.getUuid(), pd);
     }
 
-    public Map<UUID, PluginData> getPlugins() {
+    public Map<UUID, PluginDownloadData> getPlugins() {
         return Collections.unmodifiableMap(availables);
     }
 
-    public PluginData getPlugin(UUID uid) {
+    public PluginDownloadData getPlugin(UUID uid) {
         return availables.get(uid);
     }
 
-    public void retriveDescription(PluginData pd) {
+    public void retriveDescription(PluginDownloadData pd) {
         if (pd != null) {
             wc.sendDescriptionRequest(pd);
         }
     }
     
-    public WebConnection.DownloadTask download(PluginData pd){
+    public WebConnection.DownloadTask download(PluginDownloadData pd){
         if(pd!=null){
             return wc.sendDownloadRequest(pd);
         }

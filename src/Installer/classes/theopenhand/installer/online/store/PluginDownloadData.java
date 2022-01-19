@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.installer.plugins.store; 
+package theopenhand.installer.online.store;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
  *
  * @author gabri
  */
-public class PluginData {
+public class PluginDownloadData {
 
     private UUID uuid;
     private String download_path;
@@ -31,7 +32,13 @@ public class PluginData {
     private String name;
     private String description;
 
-    public PluginData() {
+    private final ArrayList<UUID> requires;
+    private final ArrayList<UUID> libraries;
+
+    public PluginDownloadData() {
+        requires = new ArrayList<>();
+        libraries = new ArrayList<>();
+
     }
 
     public UUID getUuid() {
@@ -97,4 +104,26 @@ public class PluginData {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public ArrayList<UUID> getLibraries() {
+        return libraries;
+    }
+
+    public ArrayList<UUID> getRequires() {
+        return requires;
+    }
+
+    public void addLibrary(UUID uid) {
+        libraries.add(uid);
+    }
+
+    public void addRequires(UUID uid) {
+        requires.add(uid);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
 }

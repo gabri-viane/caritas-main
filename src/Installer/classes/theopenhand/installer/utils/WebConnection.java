@@ -111,7 +111,6 @@ public class WebConnection {
 
         @Override
         protected Void call() throws Exception {
-            //System.out.println("--TASK RUNNING--");
             updateMessage("Inizio download...");
             URLConnection connection = new URL(url).openConnection();
             long file_length = connection.getContentLengthLong();
@@ -122,7 +121,6 @@ public class WebConnection {
                 long nread = 0L;
                 byte[] buf = new byte[8192];
                 int n;
-                //System.out.println("--TASK WRITING--");
                 while ((n = is.read(buf)) > 0) {
                     fos.write(buf, 0, n);
                     nread += n;

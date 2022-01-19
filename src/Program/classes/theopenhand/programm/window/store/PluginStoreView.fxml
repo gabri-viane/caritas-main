@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
@@ -21,8 +22,9 @@
          <center>
             <TableView fx:id="pluginsTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                <columns>
-                  <TableColumn fx:id="nameColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="-1.0" text="Nome" />
-                  <TableColumn fx:id="versionColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="Versione" />
+                  <TableColumn fx:id="nameColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="50.0" prefWidth="150.0" text="Nome" />
+                  <TableColumn fx:id="versionColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="50.0" prefWidth="100.0" text="Versione" />
+                  <TableColumn fx:id="installedColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="50.0" prefWidth="100.0" text="Installato" />
                </columns>
             </TableView>
          </center>
@@ -127,6 +129,12 @@
                      </children>
                   </HBox>
                   <Separator prefWidth="200.0" />
+                  <VBox fx:id="reqVB">
+                     <children>
+                        <Label text="Richiede i seguenti plugins:" />
+                        <ListView fx:id="reqLV" minWidth="100.0" prefWidth="100.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
                </children>
                <padding>
                   <Insets left="5.0" right="5.0" />
