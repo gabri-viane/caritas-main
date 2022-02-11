@@ -36,11 +36,15 @@ public interface ResultHolder<T extends BindableResult> {
      * @return
      */
     public T getLastInsert();
-    
+
     /**
      *
      * @return
      */
     public List<T> getList();
+
+    public Exception getExecutionException();
+
+    public void setLastException(Exception e);
 
 }

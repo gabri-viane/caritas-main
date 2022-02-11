@@ -47,7 +47,7 @@ public class SelectableElement<T extends ValueHolder> extends HBox implements To
 
     /**
      *
-     * @param t
+     * @param element
      */
     public SelectableElement(T element) {
         el = element;

@@ -17,7 +17,7 @@
 module Commons {
 
     requires Utils;
-    
+
     requires java.naming;
     requires java.sql;
     requires javafx.graphics;
@@ -37,6 +37,7 @@ module Commons {
     exports theopenhand.commons.connection.runtime.annotations;
     exports theopenhand.commons.connection.runtime.interfaces;
     exports theopenhand.commons.connection.runtime.impls;
+    exports theopenhand.commons.connection.runtime.custom;
     exports theopenhand.commons.events.graphics;
     exports theopenhand.commons.events.programm;
     exports theopenhand.commons.events.engines;
@@ -52,13 +53,16 @@ module Commons {
     exports theopenhand.window.graphics.inner;
     exports theopenhand.window.graphics.dialogs;
     exports theopenhand.window.graphics.commons;
+    exports theopenhand.window.graphics.commons.ordable;
 
     exports theopenhand.window.objects;
     exports theopenhand.runtime.block to Program, Runtime;
     exports theopenhand.window.hand to Program;
-    exports theopenhand.statics.privates to Program;
+    exports theopenhand.statics.privates to Program, Runtime;
     opens theopenhand.window.hand to javafx.fxml;
     opens theopenhand.window.graphics.inner to javafx.fxml;
     opens theopenhand.window.graphics.commons to javafx.fxml;
+    opens theopenhand.window.graphics.commons.ordable to javafx.graphics, javafx.fxml;
+    opens theopenhand.window.graphics.commons.ordable.components to javafx.graphics, javafx.fxml;
     //opens theopenhand to javafx.graphics, javafx.fxml;
 }

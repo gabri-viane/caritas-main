@@ -15,126 +15,109 @@
  */
 package theopenhand.window.graphics.inner;
 
-import java.util.Iterator;
+import java.io.IOException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.SingleSelectionModel;
-import theopenhand.commons.connection.runtime.interfaces.BindableResult;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
+import javafx.scene.layout.HBox;
+import javafx.util.Callback;
+import theopenhand.commons.connection.runtime.interfaces.GraphicBindableResult;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
-import theopenhand.commons.interfaces.graphics.DisplayableValue;
 
 /**
  *
  * @author gabri
- * @param <X>
  * @param <T>
  */
-public class LinkedComboBox<X extends BindableResult, T> extends ComboBox<DisplayableValue<X, T>> {
+public class LinkedComboBox<T extends GraphicBindableResult> extends HBox {
+//ComboBoxValueHolder
 
-    private ResultHolder<X> rs;
+    @FXML
+    private ComboBox<T> cb;
 
-    /**
-     *
-     */
-    public LinkedComboBox() {
+    private final ResultHolder<T> res_h;
+    private T selected;
+    private ListView<T> lv;
 
-    }
-
-    /**
-     *
-     * @param dv
-     */
-    public void addElement(DisplayableValue<X, T> dv) {
-        getItems().add(dv);
-    }
-
-    /**
-     *
-     * @param dv
-     */
-    public void removeElement(DisplayableValue<X, T> dv) {
-        getItems().remove(dv);
-    }
-
-    /**
-     *
-     * @param value
-     */
-    public void removeElements(X value) {
-        Iterator<DisplayableValue<X, T>> iterator = getItems().iterator();
-        while (iterator.hasNext()) {
-            DisplayableValue<X, T> next = iterator.next();
-            if (next.equals(value)) {
-                iterator.remove();
+    Callback<ListView<T>, ListCell<T>> cellFactory = (ListView<T> l) -> new ListCell<T>() {
+        @Override
+        protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item == null || empty) {
+                setGraphic(null);
+            } else {
+                setText(item.displayable());
             }
         }
-    }
+    };
 
     /**
      *
-     * @param r
+     * @param res
      */
-    public void linkTo(ResultHolder<X> r) {
-        rs = r;
+    public LinkedComboBox(ResultHolder<T> res) {
+        res_h = res;
+        init();
     }
 
-    /**
-     *
-     */
-    public void populateByRH() {
-        if (rs != null) {
-            ObservableList<DisplayableValue<X, T>> itms = getItems();
-            itms.clear();
-            rs.getList().forEach(e -> {
-                DisplayableValue dv = new DisplayableValue<>(e, e.toString());
-                itms.add(dv);
-            });
-            if (itms.size() > 0) {
-                this.getSelectionModel().selectFirst();
+    private void init() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            URL resource = getClass().getResource("/theopenhand/window/graphics/inner/LinkedComboBox.fxml");
+            loader.setLocation(resource);
+            loader.setController(this);
+            loader.setRoot(this);
+            loader.load();
+        } catch (IOException ex) {
+            Logger.getLogger(LinkedComboBox.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        cb.setCellFactory(cellFactory);
+        cb.getEditor().textProperty().addListener((ObservableValue<? extends String> ov, String t, String t1) -> {
+            filterList(t1);
+        });
+        cb.selectionModelProperty().addListener((ov, t, t1) -> {
+            if (!t1.isEmpty()) {
+                selected = t1.getSelectedItem();
+            } else {
+                t1.selectFirst();
+                selected = t1.getSelectedItem();
             }
-        }
+        });
+
+        refresh();
     }
 
-    /**
-     *
-     * @return
-     */
-    public X getSelected() {
-        SingleSelectionModel<DisplayableValue<X, T>> selectionModel = this.getSelectionModel();
-        if (selectionModel != null && !selectionModel.isEmpty()) {
-            return selectionModel.getSelectedItem().getValue();
-        }
-        return null;
+    public void refresh() {
+        cb.getEditor().clear();
+        ObservableList<T> its = cb.getItems();
+        its.clear();
+        its.setAll(res_h.getList());
+        //cb.getSelectionModel().selectFirst();
     }
 
-    /**
-     *
-     * @param value
-     */
-    public void selectElement(X value) {
-        Iterator<DisplayableValue<X, T>> iterator = getItems().iterator();
-        while (iterator.hasNext()) {
-            DisplayableValue<X, T> next = iterator.next();
-            if (next.equals(value)) {
-                this.getSelectionModel().select(next);
-                return;
+    private void filterList(String search) {
+        Platform.runLater(() -> {
+            ObservableList<T> its = cb.getItems();
+            if (!cb.isShowing()) {
+                cb.show();
+                lv = (ListView<T>) ((ComboBoxListViewSkin<?>) cb.getSkin()).getPopupContent();
             }
-        }
-    }
-
-    /**
-     *
-     * @param value
-     */
-    public void selectElement(T value) {
-        Iterator<DisplayableValue<X, T>> iterator = getItems().iterator();
-        while (iterator.hasNext()) {
-            DisplayableValue<X, T> next = iterator.next();
-            if (next.getDisplay().equals(value)) {
-                this.getSelectionModel().select(next);
-                return;
+            for (T it : its) {
+                if (it.displayable().toLowerCase().contains(search.toLowerCase())) {
+                    lv.selectionModelProperty().get().select(it);
+                    break;
+                }
             }
-        }
+        });
     }
 
 }

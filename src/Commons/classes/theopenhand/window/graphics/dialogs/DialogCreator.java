@@ -15,7 +15,12 @@
  */
 package theopenhand.window.graphics.dialogs;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -26,12 +31,16 @@ import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import theopenhand.commons.ReferenceQuery;
+import theopenhand.commons.connection.runtime.custom.Clause;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
 import theopenhand.commons.events.graphics.ClickListener;
+import theopenhand.commons.events.programm.ValueAcceptListener;
 import theopenhand.commons.interfaces.graphics.DialogComponent;
 import theopenhand.statics.privates.StaticReferencesPvt;
 import theopenhand.window.graphics.commons.PickerDialogCNTRL;
+import theopenhand.window.graphics.commons.ordable.OrdableWindow;
+import theopenhand.window.graphics.commons.ordable.OrdableWindowFactory;
 
 /**
  *
@@ -70,7 +79,7 @@ public class DialogCreator {
      * @return
      */
     public static Stage showDialog(DialogComponent dc, ClickListener on_accept, ClickListener on_close) {
-        Stage s = DialogCreator.showDialog(dc.getParentNode(), dc.getDialogWidth(), dc.getDialogWidth(), dc.getTitle());
+        Stage s = DialogCreator.showDialog(dc.getParentNode(), dc.getDialogWidth(), dc.getDialogHeight(), dc.getTitle());
         ClickListener cl = () -> {
             s.getScene().setRoot(new Region());
             s.close();
@@ -98,15 +107,17 @@ public class DialogCreator {
      * @param dialog
      * @return
      */
-    public static Alert showAlert(Alert.AlertType at, String title, String text, DialogPane dialog) {
+    public static Alert createAlert(Alert.AlertType at, String title, String text, DialogPane dialog) {
         ArrayList<ButtonType> als = new ArrayList<>();
         switch (at) {
             case CONFIRMATION -> {
                 als.add(ButtonType.YES);
                 als.add(ButtonType.NO);
             }
-            case INFORMATION -> als.add(ButtonType.OK);
-            case ERROR -> als.add(ButtonType.CLOSE);
+            case INFORMATION ->
+                als.add(ButtonType.OK);
+            case ERROR ->
+                als.add(ButtonType.CLOSE);
             case NONE -> {
                 als.add(ButtonType.PREVIOUS);
                 als.add(ButtonType.NEXT);
@@ -131,6 +142,11 @@ public class DialogCreator {
         }
         a.setResizable(true);
         return a;
+    }
+
+    public static Optional<ButtonType> showAlert(Alert.AlertType at, String title, String text, DialogPane dialog) {
+        Alert createAlert = createAlert(at, title, text, dialog);
+        return createAlert.showAndWait();
     }
 
     /**
@@ -170,8 +186,33 @@ public class DialogCreator {
      * @param on_order
      * @return
      */
-    public static <T extends BindableResult, X extends ResultHolder<T>> PickerDialogCNTRL<T, X> createPicker(ReferenceQuery<T, X> rq, String title, DialogComponent on_add, DialogComponent on_order) {
+    public static <T extends BindableResult, X extends ResultHolder<T>> PickerDialogCNTRL<T, X> createPicker(ReferenceQuery<T, X> rq, String title, DialogComponent on_add, ValueAcceptListener<Optional<ResultHolder>> on_order) {
         PickerDialogCNTRL<T, X> pck = new PickerDialogCNTRL(rq.getRuntime_reference(), rq.getBinded_class(), rq.getResult_holder(), rq.getQuery_id(), title, on_add, on_order);
         return pck;
+    }
+
+    public static <T extends BindableResult, X extends ResultHolder<T>> Stage createSearcher(ReferenceQuery<T, X> rq, ValueAcceptListener<Optional<ArrayList<Clause>>> on_order) {
+        Class<T> cl = rq.getBinded_class();
+        if (cl != null) {
+            try {
+                Constructor<T> constructor = cl.getConstructor();
+                constructor.setAccessible(true);
+                try {
+                    T inst = constructor.newInstance();
+                    OrdableWindow<T> generate = OrdableWindowFactory.generate(cl, rq.getQuery_id(), inst);
+                    return showDialog(generate, () -> {
+                        on_order.onAccept(Optional.of(generate.generateClauses()));
+                    }, () -> {
+                        on_order.onAccept(Optional.empty());
+                    });
+                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    Logger.getLogger(DialogCreator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (NoSuchMethodException | SecurityException ex) {
+                Logger.getLogger(DialogCreator.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            showAlert(Alert.AlertType.WARNING, "Errore plugin", "Il plugin '" + rq.getRuntime_reference().getName() + "' non è stato progettato correttamente.", null);
+        }
+        return null;
     }
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<fx:root alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefHeight="34.0" spacing="10.0" type="HBox" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <CheckBox fx:id="fieldSelectorCB" mnemonicParsing="false" text="Name" HBox.hgrow="NEVER">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </CheckBox>
+   </children>
+   <padding>
+      <Insets left="5.0" right="5.0" />
+   </padding>
+</fx:root>

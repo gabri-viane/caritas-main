@@ -112,16 +112,15 @@ public class PluginSettingPage extends AnchorPane {
         var pfh = PluginFolderHandler.getInstance();
         OpExecutor<Void> op = Loader.getInstance().remove(sl.getUuid());
         OpExecutor<Void> next = () -> {
-            DialogCreator.showAlert(Alert.AlertType.WARNING, "Disistallazione in attesa", "Il plugin verrà rimosso all'uscita del programma, al prossimo avvio non sarà più disponibile.", null).showAndWait();
+            DialogCreator.showAlert(Alert.AlertType.WARNING, "Disistallazione in attesa", "Il plugin verrà rimosso all'uscita del programma, al prossimo avvio non sarà più disponibile.", null);
             return null;
         };
         List<UUID> ll = pfh.getRequiredBy(sl.getUuid());
         Optional<ButtonType> showAndWait;
-        if (ll!= null && !ll.isEmpty()) {
-            showAndWait = DialogCreator.showAlert(Alert.AlertType.CONFIRMATION, "Disistallazione con dipendenze plugin", "Esistono " + ll.size() + " plugin che dipendono da questo. Procedendo verranno rimosse anche le dipendenze.", null).showAndWait();
+        if (ll != null && !ll.isEmpty()) {
+            showAndWait = DialogCreator.showAlert(Alert.AlertType.CONFIRMATION, "Disistallazione con dipendenze plugin", "Esistono " + ll.size() + " plugin che dipendono da questo. Procedendo verranno rimosse anche le dipendenze.", null);
         } else {
-            showAndWait = DialogCreator.showAlert(Alert.AlertType.CONFIRMATION, "Disinstallazione plugin", "Vuoi disinstallare veramente questo plugin?\nVerranno rimosse " + ref_countLBL.getText() + " funzionalità aggiunte.", null).showAndWait();
-
+            showAndWait = DialogCreator.showAlert(Alert.AlertType.CONFIRMATION, "Disinstallazione plugin", "Vuoi disinstallare veramente questo plugin?\nVerranno rimosse " + ref_countLBL.getText() + " funzionalità aggiunte.", null);
         }
         showAndWait.ifPresent(bt -> {
             if (bt.equals(ButtonType.YES)) {

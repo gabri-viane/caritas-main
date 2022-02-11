@@ -33,6 +33,7 @@ import theopenhand.window.graphics.dialogs.DialogCreator;
 public class PreparedQueryStatement<T extends BindableResult> implements Closeable {
 
     private final PreparedStatement query;
+    private String query_plain;
     private final boolean is_update;
     private final ArrayList<Field> fields;
     private final HashMap<String, Field> fs;
@@ -46,6 +47,14 @@ public class PreparedQueryStatement<T extends BindableResult> implements Closeab
         fields = new ArrayList<>();
         fs = new HashMap<>();
         fs2 = new HashMap<>();
+    }
+
+    public void setQueryPlain(String st) {
+        query_plain = st;
+    }
+
+    public String getQueryPlain() {
+        return query_plain;
     }
 
     public ResultSet execute(T object) {
@@ -84,7 +93,7 @@ public class PreparedQueryStatement<T extends BindableResult> implements Closeab
             }
         } catch (SQLException | IllegalArgumentException | IllegalAccessException ex) {
             Logger.getLogger(PreparedQueryStatement.class.getName()).log(Level.SEVERE, null, ex);
-            DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore ricezione dati", "Non è stato possibile completare la richiesta di ricerca/aggiornamento dati.", null).show();
+            DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore ricezione dati", "Non è stato possibile completare la richiesta di ricerca/aggiornamento dati.", null);
         }
         return null;
     }

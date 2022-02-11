@@ -17,12 +17,16 @@ import java.sql.PreparedStatement;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Map;
+import theopenhand.commons.Pair;
 import theopenhand.statics.StaticReferences;
 import theopenhand.commons.connection.runtime.annotations.Query;
 import theopenhand.commons.connection.runtime.annotations.QueryField;
+import theopenhand.commons.connection.runtime.custom.Clause;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
+import theopenhand.runtime.connection.runtime.utils.QueryFormatter;
 
 /**
  *
@@ -97,6 +101,18 @@ public final class StringQueryBuilder<X extends BindableResult, T extends Result
         }
         return fls;
     }
+    
+    private ArrayList<Field> findOrderedValues(String query) {
+        ArrayList<Field> fls = new ArrayList<>();
+        Pattern p = Pattern.compile("(%V([0-9]++))");
+        Matcher matcher = p.matcher(query);
+        while (matcher.find()) {
+            String numb = matcher.group(2);
+            Integer id = Integer.parseInt(numb);
+            fls.add(n_fields.get(id));
+        }
+        return fls;
+    }
 
     private CallableQueryStatement<X> prepareCallableStatement(String query, boolean is_update, boolean has_bindings, int[] binds) {
         try {
@@ -118,6 +134,7 @@ public final class StringQueryBuilder<X extends BindableResult, T extends Result
 
     private PreparedQueryStatement<X> prepareStatement(String query, boolean is_update, boolean has_result) {
         ArrayList<Field> fls = findOrederedFields(query);
+        String tmp = query;
         for (Field f : fls) {
             f.setAccessible(true);
             QueryField qf = f.getAnnotation(QueryField.class);
@@ -129,6 +146,29 @@ public final class StringQueryBuilder<X extends BindableResult, T extends Result
             PreparedQueryStatement<X> pqs = new PreparedQueryStatement<>(ps, is_update);
             pqs.setFields(fls);
             pqs.setHasResult(has_result);
+            pqs.setQueryPlain(tmp);
+            return pqs;
+        } catch (SQLException ex) {
+            Logger.getLogger(StringQueryBuilder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    public PreparedOrderedQueryStatement<X> prepareCustomStatement(String query, ArrayList<Clause> cls) {
+        Pair<String, LinkedList<Clause>> fqs = QueryFormatter.fixQueryString(query, cls);
+        ArrayList<Field> fls = findOrederedFields(fqs.getKey());
+        ArrayList<Field> fls_values = findOrderedValues(fqs.getKey());
+        query = fqs.getKey();
+        for (Field f : fls) {
+            f.setAccessible(true);
+            QueryField qf = f.getAnnotation(QueryField.class);
+            query = query.replaceAll("%N" + qf.fieldID(), qf.name());
+            query = query.replaceAll("%V" + qf.fieldID(), "?");
+        }
+        try {
+            PreparedStatement ps = StaticReferences.getConnection().getConn().prepareStatement(query);
+            PreparedOrderedQueryStatement<X> pqs = new PreparedOrderedQueryStatement<>(ps, cls);
+            pqs.setFields(fls_values);
             return pqs;
         } catch (SQLException ex) {
             Logger.getLogger(StringQueryBuilder.class.getName()).log(Level.SEVERE, null, ex);

@@ -16,7 +16,9 @@
 package theopenhand.window.graphics.commons;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.ObservableList;
@@ -24,6 +26,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -37,6 +40,7 @@ import theopenhand.commons.connection.runtime.ConnectionExecutor;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
 import theopenhand.commons.events.graphics.ClickListener;
+import theopenhand.commons.events.programm.ValueAcceptListener;
 import theopenhand.commons.interfaces.ExchangeID;
 import theopenhand.commons.interfaces.StringTransformer;
 import theopenhand.commons.interfaces.graphics.DialogComponent;
@@ -81,7 +85,7 @@ public final class PickerDialogCNTRL<T extends BindableResult, X extends ResultH
      */
     private String title = "Seleziona valore";
     private final DialogComponent on_add;
-    private final DialogComponent on_order;
+    private final ValueAcceptListener<Optional<ResultHolder>> on_order;
 
     /**
      * VARIABILI PER QUERY*
@@ -106,14 +110,14 @@ public final class PickerDialogCNTRL<T extends BindableResult, X extends ResultH
     /**
      *
      * @param rr
-     * @param type
-     * @param i
-     * @param string
-     * @param x
-     * @param dc
-     * @param dc1
+     * @param cz
+     * @param result_holder
+     * @param id_query
+     * @param title
+     * @param on_add
+     * @param on_order
      */
-    public PickerDialogCNTRL(RuntimeReference rr, Class<T> cz, X result_holder, int id_query, String title, DialogComponent on_add, DialogComponent on_order) {
+    public PickerDialogCNTRL(RuntimeReference rr, Class<T> cz, X result_holder, int id_query, String title, DialogComponent on_add, ValueAcceptListener<Optional<ResultHolder>> on_order) {
         this.rr = rr;
         this.clazz = cz;
         this.res_holder = result_holder;
@@ -136,13 +140,10 @@ public final class PickerDialogCNTRL<T extends BindableResult, X extends ResultH
         } catch (IOException ex) {
             Logger.getLogger(PickerDialogCNTRL.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if (on_order != null) {
-            orderLNK.setOnMouseReleased((t) -> {
-                orderLNK.setVisited(false);
-            });
-        } else {
-            orderLNK.setVisible(false);
-        }
+        orderLNK.setOnAction((t) -> {
+            
+            orderLNK.setVisited(false);
+        });
         refreshLNK.setOnAction(a -> {
             reloadElements(true);
             refreshLNK.setVisited(false);

@@ -16,11 +16,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import theopenhand.commons.Pair;
 import theopenhand.commons.programm.loader.LinkableBoolean;
 import theopenhand.commons.programm.loader.LinkableInteger;
 import theopenhand.runtime.annotations.SettingProperty;
-import theopenhand.runtime.connection.runtime.utils.Utils;
+import theopenhand.runtime.Utils;
 import theopenhand.runtime.block.KeyUnlock;
 import theopenhand.runtime.templates.LinkableClass;
 import theopenhand.runtime.templates.Settings;
@@ -30,10 +32,10 @@ import theopenhand.window.resources.ui.settings.plugins.PluginSettingField;
 
 /**
  * Carica le impostazioni di un plugin.
- * <p/>
+ * </p>
  * Data la {@link LinkableClass} viene chiamato il metodo {@link LinkableClass#getSettings()
  * } e vengono cercati tutti i campi con l'annotazione {@link SettingProperty}.
- * <br/>
+ * </br>
  * Questa classe si occupa di chiamare il metodo {@link Settings#setUUID(theopenhand.runtime.block.KeyUnlock, java.util.UUID)
  * } che assegna l'UUID al plugin.
  *
@@ -134,6 +136,9 @@ public class SettingsLoader {
         try {
             Object val = f.get(instance);
             Label n = new Label(val != null ? val.toString() : "N/A");
+            n.setMaxWidth(Double.MAX_VALUE);
+            n.setWrapText(true);
+            HBox.setHgrow(n, Priority.ALWAYS);
             PluginSettingField pl = new PluginSettingField(() -> {
             }, n, ann);
             pl.setButtonVisible(false);
@@ -178,7 +183,7 @@ public class SettingsLoader {
                     Number parse = NumberFormat.getIntegerInstance().parse(t1);
                     li.setValue(parse.intValue());
                 } catch (ParseException ex) {
-                    DialogCreator.showAlert(Alert.AlertType.ERROR, "Valore invalido", "Il campo corrente ammette solo valori numerici interi.", null).show();
+                    DialogCreator.showAlert(Alert.AlertType.ERROR, "Valore invalido", "Il campo corrente ammette solo valori numerici interi.", null);
                 }
             });
             if (li.getValue() == null) {

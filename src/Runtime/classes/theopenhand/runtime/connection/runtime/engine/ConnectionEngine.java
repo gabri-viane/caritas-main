@@ -10,18 +10,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.Alert;
+import theopenhand.commons.connection.runtime.custom.Clause;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
 import theopenhand.runtime.connection.runtime.types.CallableQueryStatement;
+import theopenhand.runtime.connection.runtime.types.PreparedOrderedQueryStatement;
 import theopenhand.runtime.connection.runtime.types.PreparedQueryStatement;
 import theopenhand.runtime.connection.runtime.types.StringQueryBuilder;
-import static theopenhand.runtime.connection.runtime.utils.Utils.boxPrimitiveClass;
-import static theopenhand.runtime.connection.runtime.utils.Utils.isPrimitive;
+import static theopenhand.runtime.Utils.boxPrimitiveClass;
+import static theopenhand.runtime.Utils.isPrimitive;
 import theopenhand.window.graphics.dialogs.DialogCreator;
 
 /**
@@ -75,24 +78,48 @@ public final class ConnectionEngine<C extends BindableResult, T extends ResultHo
                     }
                 }
             } catch (NoSuchMethodException ex) {
-                DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore plugin", "Il plugin corrente contiene un'errore di programmazione, non è perciò possibile usarlo", null).show();
+                DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore plugin", "Il plugin corrente contiene un'errore di programmazione, non è perciò possibile usarlo", null);
             }
         } catch (SQLException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException ex) {
             Logger.getLogger(ConnectionEngine.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void executeCall(int id) {
-        executeCall(id, null);
+    public void executeCustomQuery(int id, C assoc, ArrayList<Clause> cls) {
+        try {
+            PreparedQueryStatement<C> query = queryBuilder.getQuery(id);
+            instance.clearResults();
+            if (query.hasResult()) {
+                PreparedOrderedQueryStatement<C> poqs = queryBuilder.prepareCustomStatement(query.getQueryPlain(), cls);
+                try (ResultSet rs = poqs.execute(assoc)) {
+                    Constructor<C> cns = binded_result.getConstructor();
+                    while (rs.next()) {
+                        C inst = cns.newInstance();
+                        copyData(rs, inst, queryBuilder);
+                        instance.addResult(inst);
+                    }
+                } catch (NoSuchMethodException ex) {
+                    DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore plugin", "Il plugin corrente contiene un'errore di programmazione, non è perciò possibile usarlo", null);
+                }
+            }
+        } catch (SQLException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException ex) {
+            Logger.getLogger(ConnectionEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public void executeCall(int id, C assoc) {
+    public Exception executeCall(int id) {
+        return executeCall(id, null);
+    }
+
+    public Exception executeCall(int id, C assoc) {
         try {
             CallableQueryStatement<C> call = queryBuilder.getCallable(id);
             call.execute(assoc);
             instance.addResult(assoc);
+            return call.getLastError();
         } catch (IllegalArgumentException | SecurityException ex) {
             Logger.getLogger(ConnectionEngine.class.getName()).log(Level.SEVERE, null, ex);
+            return ex;
         }
     }
 

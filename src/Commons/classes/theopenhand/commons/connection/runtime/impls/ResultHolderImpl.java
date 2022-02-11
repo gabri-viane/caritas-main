@@ -31,6 +31,7 @@ public class ResultHolderImpl<T extends BindableResult> implements ResultHolder<
     ArrayList<T> ordered = new ArrayList<>();
     HashMap<Long, T> vals = new HashMap<>();
     private T last_insert;
+    private Exception last_ex;
 
     /**
      *
@@ -101,6 +102,16 @@ public class ResultHolderImpl<T extends BindableResult> implements ResultHolder<
      */
     public T find(long id) {
         return vals.get(id);
+    }
+
+    @Override
+    public Exception getExecutionException() {
+        return last_ex;
+    }
+
+    @Override
+    public void setLastException(Exception e) {
+        last_ex = e;
     }
 
 }

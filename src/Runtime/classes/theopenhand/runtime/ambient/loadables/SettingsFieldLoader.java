@@ -26,7 +26,7 @@ import theopenhand.commons.programm.loader.LinkableString;
 import theopenhand.commons.programm.loader.LinkableVariableInterface;
 import theopenhand.runtime.ambient.PluginEnv;
 import theopenhand.runtime.ambient.xml.SettingField;
-import theopenhand.runtime.connection.runtime.utils.Utils;
+import theopenhand.runtime.Utils;
 import theopenhand.runtime.templates.Settings;
 
 /**

@@ -15,14 +15,16 @@
  */
 package theopenhand.runtime.connection.runtime.utils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import theopenhand.commons.Pair;
-import theopenhand.commons.connection.runtime.annotations.QueryField;
-import theopenhand.runtime.connection.runtime.types.PreparedOrderedQueryStatement;
+import theopenhand.commons.connection.runtime.custom.Clause;
+import theopenhand.commons.connection.runtime.custom.ClauseFactory;
+import theopenhand.commons.connection.runtime.custom.ClauseType;
+import theopenhand.statics.privates.StaticData;
 
 /**
  *
@@ -30,67 +32,39 @@ import theopenhand.runtime.connection.runtime.types.PreparedOrderedQueryStatemen
  */
 public class QueryFormatter {
 
-    private final static String ORDER_BY = "ORDER BY";
-    private final static String ASC = " ASC";
-    private final static String DESC = " DESC";
+    public static Pair<String, LinkedList<Clause>> fixQueryString(String select_query, ArrayList<Clause> clauses) {
+        StringBuilder sb = new StringBuilder("SELECT * FROM (");
+        sb.append(select_query.replaceAll(";", "")).append(") AS ");
+        sb.append(StaticData.TEMP_QUERY_NAME);
 
-    public static enum SearchFormatter {
-        LIKE, EQUALS;
+        LinkedList<Clause> cls = new LinkedList<>();
 
-        public static String format(SearchFormatter s, String name) {
-            switch (s) {
-                case EQUALS -> {
-                    return name + " = ?";
-                }
-                case LIKE -> {
-                    return name + " LIKE ?";
-                }
-                default -> {
-                    return "";
-                }
-            }
-        }
+        shHlp(sb, ClauseType.WHERE, clauses, cls);
+        shHlp(sb, ClauseType.ORDER_BY, clauses, cls);
+        shHlp(sb, ClauseType.GROUP_BY, clauses, cls);
 
-        public static String format(String value) {
-            return value != null ? value.replaceAll("%", "\\%") : value;
-        }
-
+        return new Pair<>(sb.toString(), cls);
     }
 
-    public static ArrayList<OrderType> availableOrderTypes(PreparedOrderedQueryStatement<?> pqs) {
-        int[] orderBy = pqs.getOrdinableFields().orderBy();
-        ArrayList<OrderType> arr = new ArrayList<>();
-        for (int id : orderBy) {
-            arr.add(new OrderType(id));
-        }
-        return arr;
-    }
-
-    public static String generateOrderBy(LinkedList<OrderType> sels, PreparedOrderedQueryStatement<?> pqs) {
-        if (sels != null && !sels.isEmpty()) {
-            HashMap<Integer, Pair<QueryField, Field>> fieldIDs = pqs.getFieldIDs();
-            Iterator<OrderType> iterator = sels.iterator();
-
-            StringBuilder sb = new StringBuilder(ORDER_BY);
-
-            while (iterator.hasNext()) {
-                OrderType next = iterator.next();
-                Pair<QueryField, Field> p = fieldIDs.get(next.getFieldId());
-                QueryField key = p.getKey();
-
-                sb.append(key.name());
-                if (next.isDescendant()) {
-                    sb.append(DESC);
-                } else {
-                    sb.append(ASC);
+    private static void shHlp(StringBuilder sb, ClauseType filter, ArrayList<Clause> clauses, LinkedList<Clause> ld) {
+        Supplier<Stream<Clause>> sfilter = () -> clauses.stream().filter(cl -> {
+            return cl.getClauseType().equals(filter);
+        });
+        if (sfilter.get().count() > 0) {
+            sb.append(" ").append(filter).append(" ");
+            Iterator<Clause> it = sfilter.get().iterator();
+            boolean hn;
+            do {
+                Clause cl = it.next();
+                sb.append(ClauseFactory.formatField(cl));
+                hn = it.hasNext();
+                if (hn) {
+                    sb.append(filter.getSeparator());
                 }
-                if (iterator.hasNext()) {
-                    sb.append(", ");
-                }
-            }
-            return sb.toString();
+                ld.add(cl);
+            } while (hn);
+            sb.append(" ");
         }
-        return "";
     }
 
 }

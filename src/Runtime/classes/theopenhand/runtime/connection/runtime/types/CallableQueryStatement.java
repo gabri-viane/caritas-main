@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 import javafx.scene.control.Alert;
 import theopenhand.commons.connection.runtime.annotations.QueryField;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
-import theopenhand.runtime.connection.runtime.utils.Utils;
+import theopenhand.runtime.Utils;
 import theopenhand.window.graphics.dialogs.DialogCreator;
 
 /**
@@ -40,6 +40,8 @@ public class CallableQueryStatement<T extends BindableResult> implements Closeab
     private int[] binded_fields;
     private boolean has_bindings;
 
+    private Exception last_error;
+
     public CallableQueryStatement(CallableStatement query, boolean is_update) {
         this.query = query;
         this.is_update = is_update;
@@ -49,6 +51,7 @@ public class CallableQueryStatement<T extends BindableResult> implements Closeab
 
     public ResultSet execute(T object) {
         try {
+            last_error = null;
             query.clearParameters();
             if (object != null) {
                 for (int i = 0, y = 1; i < fields.size(); i++, y++) {
@@ -134,9 +137,11 @@ public class CallableQueryStatement<T extends BindableResult> implements Closeab
             }
 
         } catch (java.sql.SQLIntegrityConstraintViolationException duplicate) {
-            DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore Duplicato", "I valori inseriti creerebbero un duplicato.\nI dati non sono stati perciò salvati.", null).show();
+            DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore Duplicato", "I valori inseriti creerebbero un duplicato.\nUno o più dati non sono stati perciò salvati.", null);
+            last_error = duplicate;
             Logger.getLogger(PreparedQueryStatement.class.getName()).log(Level.SEVERE, null, duplicate);
         } catch (SQLException | IllegalArgumentException | IllegalAccessException ex) {
+            last_error = ex;
             Logger.getLogger(PreparedQueryStatement.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -200,6 +205,10 @@ public class CallableQueryStatement<T extends BindableResult> implements Closeab
 
     public void setBindings(int[] binds) {
         this.binded_fields = binds;
+    }
+
+    public Exception getLastError() {
+        return last_error;
     }
 
 }

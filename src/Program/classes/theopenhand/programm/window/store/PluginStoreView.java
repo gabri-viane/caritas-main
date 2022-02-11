@@ -251,13 +251,11 @@ public class PluginStoreView extends AnchorPane {
         fc.setInitialDirectory(SetupInit.getInstance().getDOWNLOAD_FOLDER());
         File selected_file = fc.showOpenDialog(StaticReferences.getMainWindowScene().getWindow());
         if (selected_file != null) {
-            Alert showAlert;
             if (Installer.generate(selected_file).installZipComplete()) {
-                showAlert = DialogCreator.showAlert(Alert.AlertType.INFORMATION, "Installazione completata", "Il plugin è stato installato.\n Riavviare il programma per applicare le modifiche.", null);
+                DialogCreator.showAlert(Alert.AlertType.INFORMATION, "Installazione completata", "Il plugin è stato installato.\n Riavviare il programma per applicare le modifiche.", null);
             } else {
-                showAlert = DialogCreator.showAlert(Alert.AlertType.ERROR, "Installazione fallita", "Non è stato possibile installare il plugin selezionato.", null);
+                DialogCreator.showAlert(Alert.AlertType.ERROR, "Installazione fallita", "Non è stato possibile installare il plugin selezionato.", null);
             }
-            showAlert.showAndWait();
         }
     }
 
@@ -266,14 +264,12 @@ public class PluginStoreView extends AnchorPane {
         taskPB.progressProperty().unbind();
         taskLB.textProperty().unbind();
         autoInstallHL.setDisable(false);
-        Alert showAlert = DialogCreator.showAlert(Alert.AlertType.INFORMATION, "Scaricamento completato", "Il plugin è stato scaricato.", null);
-        showAlert.showAndWait();
+        DialogCreator.showAlert(Alert.AlertType.INFORMATION, "Scaricamento completato", "Il plugin è stato scaricato.", null);
         taskHB.setVisible(false);
     }
 
     private void installSuccess() {
-        Alert showAlert = DialogCreator.showAlert(Alert.AlertType.INFORMATION, "Installazione completata", "Il plugin è stato scaricato e installato.\n Riavviare il programma per applicare le modifiche.", null);
-        showAlert.showAndWait();
+        DialogCreator.showAlert(Alert.AlertType.INFORMATION, "Installazione completata", "Il plugin è stato scaricato e installato.\n Riavviare il programma per applicare le modifiche.", null);
         taskHB.setVisible(false);
     }
 

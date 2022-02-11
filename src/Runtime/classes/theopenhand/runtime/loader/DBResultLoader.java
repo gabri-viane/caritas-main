@@ -22,6 +22,7 @@ import theopenhand.commons.Pair;
 import theopenhand.commons.connection.runtime.ConnectionExecutor;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
+import theopenhand.commons.events.engines.DBCustomRequestListener;
 import theopenhand.commons.events.engines.DBRequestListener;
 import theopenhand.commons.events.programm.utils.ListEventListener;
 import theopenhand.runtime.SubscriptionHandler;
@@ -72,10 +73,17 @@ public class DBResultLoader {
         };
         DBRequestListener call_listener = (RuntimeReference rr, int id, Class<? extends BindableResult> clz, BindableResult instance1) -> {
             ConnectionEngine findEngine = EngineBuilder.getInstance().findEngine(clz);
-            findEngine.executeCall(id, instance1);
-            return findEngine.getHolderInstance();
+            ResultHolder<?> rc = findEngine.getHolderInstance();
+            rc.setLastException(findEngine.executeCall(id, instance1));
+            return rc;
         };
         ConnectionExecutor.getInstance().addListener(query_listener, call_listener);
+        DBCustomRequestListener order_listener = (rr, id, clz, inst, vals) -> {
+            ConnectionEngine findEngine = EngineBuilder.getInstance().findEngine(clz);
+            findEngine.executeCustomQuery(id, inst, vals);
+            return findEngine.getHolderInstance();
+        };
+        ConnectionExecutor.getInstance().addListener(order_listener);
     }
 
     /**

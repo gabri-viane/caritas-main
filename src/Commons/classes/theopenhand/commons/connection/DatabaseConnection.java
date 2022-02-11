@@ -42,7 +42,7 @@ public final class DatabaseConnection {
     /**
      *
      */
-    public static String IP = "192.168.1.98:3306/ncdb?serverTimezone=UTC&useSSL=false";//"80.211.167.74:3306/ncdb";
+    public static String IP = "192.168.1.98:3306/ncdb?serverTimezone=UTC&useSSL=false";
 
     /**
      *
@@ -115,7 +115,7 @@ public final class DatabaseConnection {
         } catch (SQLException ex) {
             //TODO : Aggiungi eccezione connessione
             Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
-            DialogCreator.showAlert(Alert.AlertType.ERROR, "Impossibile connettersi", "Non è stato possibile connettersi al database selezionato.\nRicontrollare di essere connessi alla rete o che il server sia acceso.", null).showAndWait();
+            DialogCreator.showAlert(Alert.AlertType.ERROR, "Impossibile connettersi", "Non è stato possibile connettersi al database selezionato.\nRicontrollare di essere connessi alla rete o che il server sia acceso.", null);
         } catch (RuntimeException e) {
 
         }
