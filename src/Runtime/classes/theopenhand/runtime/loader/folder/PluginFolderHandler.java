@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import theopenhand.commons.Pair;
 import theopenhand.installer.SetupInit;
+import theopenhand.installer.interfaces.PluginHandler;
 import theopenhand.runtime.ambient.DataEnvironment;
 import theopenhand.runtime.loader.Loader;
 import theopenhand.runtime.loader.folder.xml.DependsElement;
@@ -44,7 +45,7 @@ import ttt.utils.xml.io.XMLWriter;
  *
  * @author gabri
  */
-public class PluginFolderHandler {
+public class PluginFolderHandler implements PluginHandler{
 
     private static File XML_FILE;
     private XMLDocument main_doc;
@@ -161,6 +162,7 @@ public class PluginFolderHandler {
      * @param ver
      * @param path_to_class
      */
+    @Override
     public void addPluginData(File f, String name, String ver, String path_to_class) {
         addPluginData(f, name, path_to_class, ver, UUID.randomUUID());
     }
@@ -173,6 +175,7 @@ public class PluginFolderHandler {
      * @param ver
      * @param uid
      */
+    @Override
     public void addPluginData(File f, String name, String path_to_class, String ver, UUID uid) {
         addPluginData(f, name, ver, path_to_class, uid, new ArrayList<>());
     }
@@ -187,6 +190,7 @@ public class PluginFolderHandler {
      * @param uid
      * @param dependencies
      */
+    @Override
     public void addPluginData(File f, String name, String path_to_class, String ver, UUID uid, ArrayList<UUID> dependencies) {
         if (f != null && name != null && path_to_class != null && uid != null && dependencies != null) {
             PluginLoaderElement pl = new PluginLoaderElement(f.getAbsolutePath(), name, path_to_class, ver, uid);
@@ -209,6 +213,7 @@ public class PluginFolderHandler {
      *
      * @param uuid
      */
+    @Override
     public void removePluginData(UUID uuid) {
         Optional<IXMLElement> findFirst = main_doc.getRoot().getElements().stream().filter((t) -> {
             PluginLoaderElement pe = (PluginLoaderElement) t;
@@ -247,6 +252,7 @@ public class PluginFolderHandler {
         DataEnvironment.getInstance().saveAll();
     }
 
+    @Override
     public boolean installed(UUID uid) {
         return registered.containsKey(uid);
     }

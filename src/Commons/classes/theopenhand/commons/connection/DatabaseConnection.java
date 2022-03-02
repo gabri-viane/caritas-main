@@ -6,7 +6,6 @@
 package theopenhand.commons.connection;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import theopenhand.statics.StaticReferences;
 import theopenhand.window.graphics.dialogs.DialogCreator;
 
 /**
@@ -42,17 +42,17 @@ public final class DatabaseConnection {
     /**
      *
      */
-    public static String IP = "192.168.1.98:3306/ncdb?serverTimezone=UTC&useSSL=false";
+    public static String IP = "?serverTimezone=UTC&enabledTLSProtocols=TLSv1.2";
 
     /**
      *
      */
-    public static String USER = "superuser";
+    public static String USER = "";
 
     /**
      *
      */
-    public static String PASSWORD = "rootpass";
+    public static String PASSWORD = "";
 
     private boolean AUTOCOMMIT = false;
     private boolean SAVEONEXIT = true;
@@ -83,19 +83,16 @@ public final class DatabaseConnection {
      *
      */
     public void hookShutdown() {
-        Thread hook = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    if (DBConn != null && DBConn.getMetaData() != null) {
-                        DISCONNECT();
-                    }
-                } catch (SQLException ex) {
-                    //ALLORA la connessione è già stata terminata
+        StaticReferences.subscribeOnExit((Object... args) -> {
+            try {
+                if (DBConn != null && DBConn.getMetaData() != null) {
+                    DISCONNECT();
                 }
+            } catch (SQLException ex) {
+                //ALLORA la connessione è già stata terminata
             }
-        };
-        Runtime.getRuntime().addShutdownHook(hook);
+            return null;
+        });
     }
 
     /**
@@ -131,6 +128,15 @@ public final class DatabaseConnection {
             DBConn.setAutoCommit(AUTOCOMMIT);
         } catch (SQLException ex) {
             //TODO : Aggiungi eccezione autocommit
+        }
+    }
+    
+    public void commit(){
+        try {
+            DBConn.commit();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
+            //TODO: Aggiungi eccezione al salvataggio dati
         }
     }
 
@@ -195,16 +201,6 @@ public final class DatabaseConnection {
      */
     public void saveOnForcedExit(boolean save) {
         this.SAVEONEXIT = save;
-    }
-
-    private boolean check_allowance(int type, int concurrency) {
-        try {
-            DatabaseMetaData dbMetaData = DBConn.getMetaData();
-            return dbMetaData.supportsResultSetConcurrency(type, concurrency);
-        } catch (SQLException ex) {
-            //TODO : Aggiungi eccezione connessione non supporta la concorrenza
-            return false;
-        }
     }
 
     /**

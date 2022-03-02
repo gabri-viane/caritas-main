@@ -16,6 +16,8 @@
 package theopenhand.runtime.loader.folder.xml;
 
 import java.util.UUID;
+import ttt.utils.engines.enums.MethodType;
+import ttt.utils.engines.interfaces.EngineMethod;
 import ttt.utils.xml.document.XMLElement;
 import ttt.utils.xml.engine.annotations.Element;
 
@@ -29,12 +31,19 @@ import ttt.utils.xml.engine.annotations.Element;
 @Element(Name = "depends", CanHaveTags = false)
 public class DependsElement extends XMLElement {
 
+    private UUID uuid;
+
     public DependsElement() {
         super("depends");
     }
 
+    @EngineMethod(MethodType = MethodType.CALC)
+    public void calc() {
+        uuid = UUID.fromString(getValue());
+    }
+
     public UUID getUUID() {
-        return UUID.fromString(getValue());
+        return uuid;
     }
 
 }

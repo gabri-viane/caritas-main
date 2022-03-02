@@ -43,9 +43,9 @@ import ttt.utils.xml.engine.annotations.Tag;
  * </ul>
  *
  * Viene usato solo al caricamento e alla scrittura del file di
- * {@link SetupInit#PLUGINS_XML} , mentre viene aggiornato ogni volta che viene installato
- * un plugin.
- *<br>
+ * {@link SetupInit#PLUGINS_XML} , mentre viene aggiornato ogni volta che viene
+ * installato un plugin.
+ * <br>
  * Un plugin appena installato avrà il relativo {@link PluginLoaderElement}
  * registrato, solo dopo aver chiamato {@link PluginFolderHandler#addPluginData(java.io.File, java.lang.String, java.lang.String, java.lang.String)
  * } o simile.
@@ -76,6 +76,8 @@ public class PluginLoaderElement extends XMLElement {
     @EngineField(FieldType = FieldType.READ_AND_WRITE)
     @Tag(Name = "ver")
     private String version;
+
+    private UUID uuid_fl;
 
     public PluginLoaderElement() {
         super("plugin");
@@ -123,7 +125,7 @@ public class PluginLoaderElement extends XMLElement {
     }
 
     public UUID getUUID() {
-        return UUID.fromString(uuid);
+        return uuid_fl;
     }
 
     public void setUUID(String uuid) {
@@ -132,6 +134,7 @@ public class PluginLoaderElement extends XMLElement {
 
     public void setUUID(UUID uuid) {
         this.uuid = uuid.toString();
+        this.uuid_fl = uuid;
     }
 
     public String getPlugin_name() {
@@ -152,6 +155,7 @@ public class PluginLoaderElement extends XMLElement {
 
     @EngineMethod(MethodType = MethodType.CALC)
     public void generateDependencies() {
+        uuid_fl = UUID.fromString(uuid);
         getElements().forEach(el -> {
             deps.add(UUID.fromString(el.getValue()));
         });

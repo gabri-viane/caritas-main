@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import theopenhand.commons.Pair;
+import theopenhand.commons.SharedReferenceQuery;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.events.programm.OpExecutor;
 import theopenhand.commons.events.programm.utils.ListEventListener;
@@ -61,6 +62,7 @@ public class Loader {
             @Override
             public void onElementAdded(RuntimeReference element) {
                 if (current_UUID != null) {
+                    SharedReferenceQuery.getInstance().registerRR(element);
                     loaded_references.get(current_UUID).add(element);
                 }
             }

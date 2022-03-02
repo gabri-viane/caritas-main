@@ -15,19 +15,18 @@
  */
 package theopenhand.programm.window.store;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -41,15 +40,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import theopenhand.installer.SetupInit;
+import theopenhand.installer.online.store.DownloaderComplement;
 import theopenhand.installer.online.store.PluginDownloadData;
 import theopenhand.installer.online.store.PluginStore;
 import theopenhand.installer.utils.WebConnection;
-import theopenhand.runtime.loader.folder.Installer;
 import theopenhand.runtime.loader.folder.PluginFolderHandler;
-import theopenhand.statics.StaticReferences;
-import theopenhand.window.graphics.dialogs.DialogCreator;
 
 /**
  *
@@ -116,6 +111,7 @@ public class PluginStoreView extends AnchorPane {
 
     private final PluginStore ps;
     HashMap<UUID, PluginDownloadData> to_install = new HashMap<>();
+    private DownloaderComplement dc;
 
     public PluginStoreView() {
         ps = PluginStore.getInstance();
@@ -133,6 +129,7 @@ public class PluginStoreView extends AnchorPane {
         } catch (IOException ex) {
             Logger.getLogger(PluginStoreView.class.getName()).log(Level.SEVERE, null, ex);
         }
+        dc = new DownloaderComplement(PluginFolderHandler.getInstance(), taskHB, taskPB, taskLB);
         iconStore.setImage(new Image(this.getClass().getResourceAsStream("/theopenhand/programm/resources/plugin_store_symbol.png")));
         nameColumn.setCellValueFactory(new CustomPVF("name"));
         versionColumn.setCellValueFactory(new CustomPVF("version"));
@@ -147,24 +144,31 @@ public class PluginStoreView extends AnchorPane {
         autoInstallHL.setOnAction(a -> {
             PluginDownloadData pd = (PluginDownloadData) autoInstallHL.getUserData();
             WebConnection.DownloadTask dt = ps.download(pd);
+
             dt.setOnSucceeded((t) -> {
-                onDownloadEnd(dt, pd);
-                installRequired(pd);
-                installSuccess();
+                dc.onDownloadEnd(dt, pd, (args) -> {
+                    autoInstallHL.setDisable(false);
+                    return null;
+                });
+                dc.installRequired(pd, (args) -> {
+                    refresh();
+                    return null;
+                });
+                dc.installSuccess();
             });
             autoInstallHL.setVisited(false);
-            startDownload(dt);
+            dc.startDownload(dt);
         });
         manualInstallHL.setOnAction(a -> {
             WebConnection.DownloadTask dt = ps.download((PluginDownloadData) autoInstallHL.getUserData());
             dt.setOnSucceeded((t) -> {
-                downloadSuccess();
+                dc.downloadSuccess(() -> autoInstallHL.setDisable(false));
             });
             autoInstallHL.setVisited(false);
-            startDownload(dt);
+            dc.startDownload(dt);
         });
         zipInstallHL.setOnAction(a -> {
-            zipInstall();
+            dc.zipInstall();
             zipInstallHL.setVisited(false);
         });
         jarInstallHL.setOnAction(a -> {
@@ -177,34 +181,17 @@ public class PluginStoreView extends AnchorPane {
         noSelection();
     }
 
-    private void installRequired(PluginDownloadData pd) {
-        to_install.clear();
-        findAllRequired(pd);
-        to_install.forEach((t, u) -> {
-            WebConnection.DownloadTask dt = ps.download(u);
-            dt.setOnSucceeded(e -> {
-                onDownloadEnd(dt, u);
-            });
-            startDownload(dt);
-        });
-    }
-
-    private void findAllRequired(PluginDownloadData pd) {
-        pd.getRequires().forEach(uid -> {
-            PluginDownloadData plugin_to_install = ps.getPlugin(uid);
-            if (!PluginFolderHandler.getInstance().installed(uid)) {
-                to_install.put(uid, plugin_to_install);
-                findAllRequired(plugin_to_install);
-            }
-        });
-    }
-
     private void refresh() {
-        ps.refresh();
-        ObservableList<PluginDownloadData> items = pluginsTable.getItems();
-        pluginsTable.getSelectionModel().clearSelection();
-        items.clear();
-        items.addAll(ps.getPlugins().values());
+        dc.forceRefresh((args) -> {
+            Platform.runLater(() -> {
+                ObservableList<PluginDownloadData> items = pluginsTable.getItems();
+                pluginsTable.getSelectionModel().clearSelection();
+                items.clear();
+                items.addAll(ps.getPlugins().values());
+            });
+            return null;
+        });
+
     }
 
     private void noSelection() {
@@ -244,51 +231,6 @@ public class PluginStoreView extends AnchorPane {
             reqVB.setVisible(false);
         }
         descTA.setText(pd.getDescription());
-    }
-
-    private void zipInstall() {
-        FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(SetupInit.getInstance().getDOWNLOAD_FOLDER());
-        File selected_file = fc.showOpenDialog(StaticReferences.getMainWindowScene().getWindow());
-        if (selected_file != null) {
-            if (Installer.generate(selected_file).installZipComplete()) {
-                DialogCreator.showAlert(Alert.AlertType.INFORMATION, "Installazione completata", "Il plugin è stato installato.\n Riavviare il programma per applicare le modifiche.", null);
-            } else {
-                DialogCreator.showAlert(Alert.AlertType.ERROR, "Installazione fallita", "Non è stato possibile installare il plugin selezionato.", null);
-            }
-        }
-    }
-
-    private void downloadSuccess() {
-        taskHB.setVisible(false);
-        taskPB.progressProperty().unbind();
-        taskLB.textProperty().unbind();
-        autoInstallHL.setDisable(false);
-        DialogCreator.showAlert(Alert.AlertType.INFORMATION, "Scaricamento completato", "Il plugin è stato scaricato.", null);
-        taskHB.setVisible(false);
-    }
-
-    private void installSuccess() {
-        DialogCreator.showAlert(Alert.AlertType.INFORMATION, "Installazione completata", "Il plugin è stato scaricato e installato.\n Riavviare il programma per applicare le modifiche.", null);
-        taskHB.setVisible(false);
-    }
-
-    private void startDownload(WebConnection.DownloadTask dt) {
-        taskHB.setVisible(true);
-        taskPB.progressProperty().bind(dt.progressProperty());
-        taskLB.textProperty().bind(dt.messageProperty());
-        autoInstallHL.setDisable(true);
-        Thread td = new Thread(dt);
-        td.start();
-    }
-
-    private void onDownloadEnd(WebConnection.DownloadTask dt, PluginDownloadData pd) {
-        taskHB.setVisible(false);
-        taskPB.progressProperty().unbind();
-        taskLB.textProperty().unbind();
-        autoInstallHL.setDisable(false);
-        Installer.generate(dt.getOutput()).installFrom(pd);
-        refresh();
     }
 
     private class CustomPVF extends PropertyValueFactory<PluginDownloadData, String> {

@@ -15,8 +15,6 @@
  */
 package theopenhand.runtime.ambient.xml;
 
-import java.io.File;
-import theopenhand.runtime.data.DataElement;
 import ttt.utils.engines.enums.FieldType;
 import ttt.utils.engines.interfaces.EngineField;
 import ttt.utils.xml.document.XMLElement;

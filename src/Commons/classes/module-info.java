@@ -56,9 +56,9 @@ module Commons {
     exports theopenhand.window.graphics.commons.ordable;
 
     exports theopenhand.window.objects;
-    exports theopenhand.runtime.block to Program, Runtime;
+    exports theopenhand.runtime.block to Program, Runtime, Installer;
     exports theopenhand.window.hand to Program;
-    exports theopenhand.statics.privates to Program, Runtime;
+    exports theopenhand.statics.privates to Program, Runtime, Installer;
     opens theopenhand.window.hand to javafx.fxml;
     opens theopenhand.window.graphics.inner to javafx.fxml;
     opens theopenhand.window.graphics.commons to javafx.fxml;

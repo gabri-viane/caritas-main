@@ -5,6 +5,7 @@
  */
 package theopenhand.commons.handlers;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
@@ -51,14 +52,16 @@ public class MainWindowEventsHandler {
         LATERAL_MENU_BUTTON_HANDLER.addListener(() -> wndw_controller.getCollapseLateralMenu().fire());
         MENU_PLUGIN_SETTINGS_HANDLER.addListener(() -> wndw_controller.getPluginSettingsBtn().fire());
     }
-    
+
     /**
      *
      * @param b
      */
     public void addLateralTitledPane(TitledPane b) {
         Accordion a = wndw_controller.getPanesOptionContainer();
-        a.getPanes().add(b);
+        Platform.runLater(() -> {
+            a.getPanes().add(b);
+        });
         GENERAL_COMPONENT_HANDLER.addedComponent(a, b);
     }
 

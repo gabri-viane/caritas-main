@@ -16,7 +16,6 @@
 package theopenhand.window.graphics.commons;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -26,7 +25,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -36,14 +34,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import theopenhand.commons.ReferenceQuery;
+import theopenhand.commons.SharedReferenceQuery;
 import theopenhand.commons.connection.runtime.ConnectionExecutor;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
 import theopenhand.commons.events.graphics.ClickListener;
-import theopenhand.commons.events.programm.ValueAcceptListener;
 import theopenhand.commons.interfaces.ExchangeID;
 import theopenhand.commons.interfaces.StringTransformer;
 import theopenhand.commons.interfaces.graphics.DialogComponent;
+import theopenhand.runtime.Utils;
 import theopenhand.runtime.templates.RuntimeReference;
 import theopenhand.window.graphics.dialogs.DialogCreator;
 import theopenhand.window.graphics.inner.RadioValueButton;
@@ -85,7 +85,6 @@ public final class PickerDialogCNTRL<T extends BindableResult, X extends ResultH
      */
     private String title = "Seleziona valore";
     private final DialogComponent on_add;
-    private final ValueAcceptListener<Optional<ResultHolder>> on_order;
 
     /**
      * VARIABILI PER QUERY*
@@ -115,15 +114,13 @@ public final class PickerDialogCNTRL<T extends BindableResult, X extends ResultH
      * @param id_query
      * @param title
      * @param on_add
-     * @param on_order
      */
-    public PickerDialogCNTRL(RuntimeReference rr, Class<T> cz, X result_holder, int id_query, String title, DialogComponent on_add, ValueAcceptListener<Optional<ResultHolder>> on_order) {
+    public PickerDialogCNTRL(RuntimeReference rr, Class<T> cz, X result_holder, int id_query, String title, DialogComponent on_add) {
         this.rr = rr;
         this.clazz = cz;
         this.res_holder = result_holder;
         this.id_query = id_query;
         this.on_add = on_add;
-        this.on_order = on_order;
         tg = new ToggleGroup();
         init();
         setTitle(title);
@@ -141,11 +138,15 @@ public final class PickerDialogCNTRL<T extends BindableResult, X extends ResultH
             Logger.getLogger(PickerDialogCNTRL.class.getName()).log(Level.SEVERE, null, ex);
         }
         orderLNK.setOnAction((t) -> {
-            
+            SharedReferenceQuery.execute(new ReferenceQuery(rr, clazz, res_holder, id_query), Utils.newInstance(clazz), SharedReferenceQuery.EXECUTION_REQUEST.CUSTOM_QUERY, (os) -> {
+                res_holder = (X) ((Optional<ResultHolder>) os[0]).orElse(null);
+                onRefresh(false);
+                return null;
+            });
             orderLNK.setVisited(false);
         });
         refreshLNK.setOnAction(a -> {
-            reloadElements(true);
+            onRefresh(true);
             refreshLNK.setVisited(false);
         });
         if (on_add != null) {
@@ -168,10 +169,11 @@ public final class PickerDialogCNTRL<T extends BindableResult, X extends ResultH
 
     /**
      *
-     * @param refresh
+     * @param reload
      */
-    public void reloadElements(boolean refresh) {
-        if (refresh) {
+    @Override
+    public void onRefresh(boolean reload) {
+        if (reload) {
             res_holder = (X) ConnectionExecutor.getInstance().executeQuery(rr, id_query, clazz, null).orElse(null);
         }
         if (res_holder != null) {

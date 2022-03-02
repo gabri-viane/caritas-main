@@ -99,12 +99,10 @@ public class WebConnection {
 
         private final String url;
         private final String update_file_name;
-        private final File dir;
         private final File output;
 
         public DownloadTask(String url, String file_name, File dir) {
             this.url = url;
-            this.dir = dir;
             this.update_file_name = file_name;
             this.output = new File(dir.getAbsolutePath() + File.separatorChar + update_file_name);
         }

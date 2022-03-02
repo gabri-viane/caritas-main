@@ -20,7 +20,7 @@ package theopenhand.commons.interfaces.graphics;
  * @author gabri
  * @param <E>
  */
-public interface DialogPicker<E> {
+public interface DialogPicker<E> extends Refreshable{
 
     /**
      *

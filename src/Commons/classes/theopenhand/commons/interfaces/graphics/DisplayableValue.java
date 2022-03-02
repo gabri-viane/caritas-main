@@ -30,7 +30,7 @@ public class DisplayableValue<X, T> {
 
     /**
      *
-     * @param x
+     * @param value
      * @param display
      */
     public DisplayableValue(X value, T display) {
@@ -66,8 +66,7 @@ public class DisplayableValue<X, T> {
     @Override
     public boolean equals(Object obj) {
         if (obj != null) {
-            if (obj instanceof DisplayableValue) {
-                DisplayableValue kd = (DisplayableValue) obj;
+            if (obj instanceof DisplayableValue kd) {
                 return value.equals(kd.value);
             } else {
                 return value.equals(obj);

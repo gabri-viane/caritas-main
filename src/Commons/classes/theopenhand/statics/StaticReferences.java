@@ -5,8 +5,10 @@
  */
 package theopenhand.statics;
 
+import java.util.ArrayList;
 import javafx.scene.Scene;
 import theopenhand.commons.connection.DatabaseConnection;
+import theopenhand.commons.events.programm.FutureCallable;
 import theopenhand.commons.handlers.MainWindowEventsHandler;
 
 /**
@@ -22,6 +24,23 @@ public class StaticReferences {
 
     private static Scene MAIN_WINDOW_SCENE;
     private static MainWindowEventsHandler MAIN_WINDOW_EVENTS_HANDLER;
+    private static ArrayList<FutureCallable<Void>> on_runtime_exit = new ArrayList<>();
+
+    static {
+        Thread hook = new Thread() {
+            @Override
+            public void run() {
+                on_runtime_exit.forEach(a -> {
+                    a.execute();
+                });
+            }
+        };
+        Runtime.getRuntime().addShutdownHook(hook);
+    }
+
+    public static void subscribeOnExit(FutureCallable<Void> clb) {
+        on_runtime_exit.add(clb);
+    }
 
     /**
      *

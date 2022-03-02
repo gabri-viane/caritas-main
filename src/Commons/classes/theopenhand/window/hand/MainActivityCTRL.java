@@ -27,8 +27,11 @@ import javafx.scene.layout.VBox;
  */
 public class MainActivityCTRL implements Initializable {
 
-    @FXML
+ @FXML
     private MenuItem aboutMenuBtn;
+
+    @FXML
+    private HBox belowContainer;
 
     @FXML
     private Button collapseLateralMenu;
@@ -38,6 +41,9 @@ public class MainActivityCTRL implements Initializable {
 
     @FXML
     private MenuItem connInternetMenuBtn;
+
+    @FXML
+    private MenuItem connSetupBTN;
 
     @FXML
     private MenuItem connSiteMenuBtn;
@@ -104,6 +110,7 @@ public class MainActivityCTRL implements Initializable {
 
     @FXML
     private Label userLB;
+
 
     /**
      * Initializes the controller class.
@@ -307,6 +314,10 @@ public class MainActivityCTRL implements Initializable {
         return pluginStoreBtn;
     }
 
+    public MenuItem getConnSetupBTN() {
+        return connSetupBTN;
+    }
+
     public Label getPluginCounterLB() {
         return pluginCounterLB;
     }
@@ -327,4 +338,15 @@ public class MainActivityCTRL implements Initializable {
         return userLB;
     }
 
+    public HBox getBelowContainer() {
+        return belowContainer;
+    }
+
+    public void setRestartVisible(boolean visible) {
+        if (visible) {
+            belowContainer.getChildren().add(restartHB);
+        } else {
+            belowContainer.getChildren().remove(restartHB);
+        }
+    }
 }

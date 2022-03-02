@@ -22,4 +22,6 @@ package theopenhand.statics.privates;
 public class StaticData {
 
     public static final String TEMP_QUERY_NAME = "tmp";
+    
+    public static final String ZIP_UPDATE_PROGRAMM_NAME = "update";
 }

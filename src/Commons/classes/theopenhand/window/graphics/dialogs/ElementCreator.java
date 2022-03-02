@@ -28,7 +28,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import theopenhand.commons.DataUtils;
 import theopenhand.commons.Pair;
-import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
 import theopenhand.commons.interfaces.graphics.ColumnData;
 import theopenhand.commons.interfaces.graphics.TableAssoc;
 import theopenhand.window.graphics.inner.DisplayTableValue;
@@ -47,10 +46,9 @@ public class ElementCreator {
      *
      * @param <T>
      * @param clazz
-     * @param res
      * @return
      */
-    public static <T extends TableAssoc> DisplayTableValue<T> generateTable(Class<T> clazz, ResultHolder<T> res) {
+    public static <T extends TableAssoc> DisplayTableValue<T> generateTable(Class<T> clazz) {
         DisplayTableValue<T> table = new DisplayTableValue<>();
         Field[] dfs = clazz.getDeclaredFields();
         HashMap<String, Field> fields = new HashMap<>();

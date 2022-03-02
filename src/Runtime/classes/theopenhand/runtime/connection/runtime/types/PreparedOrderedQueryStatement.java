@@ -96,7 +96,7 @@ public class PreparedOrderedQueryStatement<T extends BindableResult> implements 
                     } else if (t == Blob.class) {
                         tmp_query.setBlob(y, (Blob) f.get(object));
                     } else if (t == Date.class) {
-                        tmp_query.setDate(y, (java.sql.Date) f.get(object));
+                        tmp_query.setDate(y, new java.sql.Date(((Date) f.get(object)).getTime()));
                     } else if (t == BigInteger.class) {
                         tmp_query.setLong(y, ((BigInteger) f.get(object)).longValue());
                     }

@@ -19,15 +19,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import ttt.utils.xml.io.XMLWriter;
 
 /**
  *
  * @author gabri
  */
 public final class SetupInit {
-
+    
     private static SetupInit instance;
-
+    
     private File MAIN_FOLDER;
     private File LOGS_FOLDER;
     private File DOWN_FOLDER;
@@ -38,7 +39,7 @@ public final class SetupInit {
     private File PLUGINS_FOLDER;
     private File PLUGINS_DATA_FOLDER;
     private File PLUGINS_XML;
-
+    
     private SetupInit() {
         init();
     }
@@ -53,13 +54,13 @@ public final class SetupInit {
         }
         return instance;
     }
-
+    
     private void init() {
         initGeneral();
         initSettings();
         initPlugins();
     }
-
+    
     private void initGeneral() {
         MAIN_FOLDER = new File(SetupFolders.PATH_TO_DATA);
         LOGS_FOLDER = new File(SetupFolders.PATH_TO_LOGS);
@@ -87,7 +88,7 @@ public final class SetupInit {
             }
         }
     }
-
+    
     private void initSettings() {
         CONNECTIONS_SETTINGS = new File(SetupFolders.CONNECTIONS_SETTINGS_PATH_FILE);
         GENERAL_SETTINGS = new File(SetupFolders.GENERAL_SETTINGS_PATH_FILE);
@@ -95,18 +96,21 @@ public final class SetupInit {
         try {
             if (!GENERAL_SETTINGS.exists()) {
                 GENERAL_SETTINGS.createNewFile();
+                XMLWriter.writeEmptyDocument(GENERAL_SETTINGS);
             }
             if (!PLUGINS_SETTINGS.exists()) {
                 PLUGINS_SETTINGS.createNewFile();
+                XMLWriter.writeEmptyDocument(PLUGINS_SETTINGS);
             }
             if (!CONNECTIONS_SETTINGS.exists()) {
                 CONNECTIONS_SETTINGS.createNewFile();
+                XMLWriter.writeEmptyDocument(CONNECTIONS_SETTINGS);
             }
         } catch (IOException ex) {
             Logger.getLogger(SetupInit.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     private void initPlugins() {
         PLUGINS_DATA_FOLDER = new File(SetupFolders.PLUGINS_DATA_PATH_FOLDER);
         PLUGINS_XML = new File(SetupFolders.XML_INSTRUCTION_PATH_FILE);
@@ -196,5 +200,5 @@ public final class SetupInit {
     public File getPLUGINS_XML() {
         return PLUGINS_XML;
     }
-
+    
 }

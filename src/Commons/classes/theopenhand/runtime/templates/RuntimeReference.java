@@ -23,7 +23,7 @@ public abstract class RuntimeReference {
 
     /**
      *
-     * @param string
+     * @param ref_name
      */
     public RuntimeReference(String ref_name) {
         this.controllers = new ArrayList<>();

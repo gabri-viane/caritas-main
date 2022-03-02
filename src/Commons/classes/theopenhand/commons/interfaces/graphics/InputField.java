@@ -18,24 +18,25 @@ package theopenhand.commons.interfaces.graphics;
 /**
  *
  * @author gabri
+ * @param <T>
  */
-public interface InputField {
+public interface InputField<T> {
     
     /**
      *
      * @return
      */
-    public Class<?> getInputType();
+    public Class<T> getInputType();
 
     /**
      *
      * @param value
      */
-    public void set(Object value);
+    public void set(T value);
 
     /**
      *
      * @return
      */
-    public Object get();
+    public T get();
 }

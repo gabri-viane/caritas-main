@@ -64,7 +64,7 @@ public class OrdableWindowFactory {
                             cl_s.setClauseType(ClauseType.ORDER_BY);
                             ow.addElement(new OrderElement<>(cl_s, p.getValue()));
                         }
-                        case GROUP_BY->{
+                        case GROUP_BY -> {
                             cl_s.setClauseType(ClauseType.GROUP_BY);
                             ow.addElement(new GroupElement<>(cl_s, p.getValue()));
                         }
@@ -74,7 +74,9 @@ public class OrdableWindowFactory {
             saved.putIfAbsent(cl, ow);
             return ow;
         } else {
-            return saved.get(cl);
+            OrdableWindow get = saved.get(cl);
+            get.setInstance(in);
+            return get;
         }
     }
 

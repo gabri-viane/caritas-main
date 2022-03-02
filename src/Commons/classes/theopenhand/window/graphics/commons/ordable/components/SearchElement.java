@@ -59,7 +59,7 @@ public class SearchElement<T extends BindableResult> extends HBox implements Val
     private final Field assoc;
     private final QueryCustom qc_assoc;
     private final Clause cl;
-    private final T instance;
+    private T instance;
 
     private ClickListener on_req = () -> {
     };
@@ -134,7 +134,7 @@ public class SearchElement<T extends BindableResult> extends HBox implements Val
             on_req = () -> {
                 cl.setClauseType(ClauseType.WHERE);
                 cl.setClauseData(optionsCB.getValue());
-                storeValue(Utils.castTo(cb.isSelected(),type));
+                storeValue(cb.isSelected());
             };
             n = cb;
             cb.setOnAction(a -> {
@@ -176,6 +176,10 @@ public class SearchElement<T extends BindableResult> extends HBox implements Val
         return this.fieldSelectorCB.isSelected();
     }
 
+    public void setInstance(T instance){
+        this.instance = instance;
+    }
+    
     @Override
     public Clause getValue() {
         on_req.onClick();

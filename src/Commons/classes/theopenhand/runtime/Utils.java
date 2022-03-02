@@ -5,8 +5,12 @@
  */
 package theopenhand.runtime;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -43,8 +47,8 @@ public final class Utils {
     }
 
     public static <T, Y> T castTo(Y o, Class<T> ct) {
-        if(isPrimitive(o.getClass())){
-            if(boxPrimitiveClass(o.getClass()).equals(ct)){
+        if (isPrimitive(o.getClass())) {
+            if (boxPrimitiveClass(o.getClass()).equals(ct)) {
                 return ct.cast(o);
             }
         }
@@ -63,11 +67,13 @@ public final class Utils {
         } else if (ct.equals(String.class)) {
             return ct.cast(o.toString());
         } else if (ct.equals(BigInteger.class)) {
-            Class<?> bpc = boxPrimitiveClass(o.getClass());
-            if (bpc.equals(Long.class)) {
-                return ct.cast(BigInteger.valueOf((Long) o));
-            } else if (bpc.equals(Integer.class)) {
-                return ct.cast(BigInteger.valueOf((Integer) (o)));
+            if (isPrimitive(o.getClass())) {
+                Class<?> bpc = boxPrimitiveClass(o.getClass());
+                if (bpc.equals(Long.class)) {
+                    return ct.cast(BigInteger.valueOf((Long) o));
+                } else if (bpc.equals(Integer.class)) {
+                    return ct.cast(BigInteger.valueOf((Integer) (o)));
+                }
             }
             return ct.cast(BigInteger.valueOf(Long.parseLong(o.toString())));
         }
@@ -81,5 +87,15 @@ public final class Utils {
             }
         }
         return false;
+    }
+
+    public static <T> T newInstance(Class<T> ct) {
+        try {
+            Constructor<T> constructor = ct.getConstructor();
+            return constructor.newInstance();
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }

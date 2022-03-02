@@ -18,13 +18,20 @@ module Installer {
     requires Commons;
     requires Utils;
     requires java.logging;
+    requires java.sql;
     requires javafx.graphics;
     requires javafx.controls;
+    requires javafx.fxml;
     requires com.google.gson;
-    
+
     exports theopenhand.installer;
     exports theopenhand.installer.data;
+    exports theopenhand.installer.online.update;
     exports theopenhand.installer.online.store;
     exports theopenhand.installer.utils;
+    exports theopenhand.installer.interfaces;
     opens theopenhand.installer.utils to javafx.graphics;
+    opens theopenhand.installer.graphics to javafx.graphics, javafx.fxml;
+    opens theopenhand.installer.data.xml.settings to Utils;
+    opens theopenhand.installer.data.xml.connection to Utils;
 }

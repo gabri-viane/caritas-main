@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.sql.PreparedStatement;
 import java.sql.CallableStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -101,7 +102,7 @@ public final class StringQueryBuilder<X extends BindableResult, T extends Result
         }
         return fls;
     }
-    
+
     private ArrayList<Field> findOrderedValues(String query) {
         ArrayList<Field> fls = new ArrayList<>();
         Pattern p = Pattern.compile("(%V([0-9]++))");
@@ -142,7 +143,7 @@ public final class StringQueryBuilder<X extends BindableResult, T extends Result
             query = query.replaceAll("%V" + qf.fieldID(), "?");
         }
         try {
-            PreparedStatement ps = StaticReferences.getConnection().getConn().prepareStatement(query);
+            PreparedStatement ps = StaticReferences.getConnection().getConn().prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             PreparedQueryStatement<X> pqs = new PreparedQueryStatement<>(ps, is_update);
             pqs.setFields(fls);
             pqs.setHasResult(has_result);

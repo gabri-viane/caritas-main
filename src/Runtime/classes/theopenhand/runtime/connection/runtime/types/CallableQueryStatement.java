@@ -23,6 +23,7 @@ import javafx.scene.control.Alert;
 import theopenhand.commons.connection.runtime.annotations.QueryField;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.runtime.Utils;
+import theopenhand.statics.StaticReferences;
 import theopenhand.window.graphics.dialogs.DialogCreator;
 
 /**
@@ -135,7 +136,7 @@ public class CallableQueryStatement<T extends BindableResult> implements Closeab
                     }
                 });
             }
-
+            StaticReferences.getConnection().commit();
         } catch (java.sql.SQLIntegrityConstraintViolationException duplicate) {
             DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore Duplicato", "I valori inseriti creerebbero un duplicato.\nUno o più dati non sono stati perciò salvati.", null);
             last_error = duplicate;

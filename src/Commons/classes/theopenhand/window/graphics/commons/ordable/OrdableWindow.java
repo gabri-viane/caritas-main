@@ -185,4 +185,11 @@ public class OrdableWindow<T extends BindableResult> extends AnchorPane implemen
         }
     }
 
+    protected void setInstance(T in) {
+        ses.forEach(se->{
+            se.setInstance(in);
+        });
+    }
+
+
 }

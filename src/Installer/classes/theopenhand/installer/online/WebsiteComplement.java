@@ -28,6 +28,7 @@ import theopenhand.installer.SetupInit;
 import theopenhand.installer.online.store.PluginStore;
 import theopenhand.installer.utils.WebConnection;
 import theopenhand.installer.utils.WebConnection.DownloadTask;
+import theopenhand.statics.privates.StaticData;
 import theopenhand.window.graphics.dialogs.DialogCreator;
 
 /**
@@ -39,11 +40,22 @@ public class WebsiteComplement {
     private static final String VIEW_PLUGIN_STORE = "https://vnl-eng.net/sections/TCE/ncdb/store/store.php?t=1";
     private static final String VIEW_PLUGIN_DESCRIPTION_STORE = "https://vnl-eng.net/sections/TCE/ncdb/store/store.php?t=2&d=";
     private static final String DOWNLOAD_PLUGIN = "https://vnl-eng.net/sections/TCE/ncdb/store/";
-    private static final String VIEW_VERSION_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/";
-    private static final String DOWNLOAD_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/";
+    private static final String VIEW_VERSION_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/program.php?t=4";
+    private static final String DOWNLOAD_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/program.php?t=5&d=";
     private static final String DOWNLOAD_OUTER_HAND = "https://vnl-eng.net/sections/TCE/ncdb/program/";
 
     public WebsiteComplement() {
+    }
+
+    public JsonObject sendProgramUpdateRequest() {
+        String s = WebConnection.comunicate(VIEW_VERSION_PROGRAMM, "");
+        if (s != null) {
+            JsonObject jo = JsonParser.parseString(s).getAsJsonObject();
+            return jo;
+        } else {
+            DialogCreator.showAlert(Alert.AlertType.WARNING, "Connessione fallita", "Impossibile trovare aggiornamenti.", null);
+        }
+        return null;
     }
 
     public void sendViewRequest(PluginStore ps) {
@@ -100,8 +112,12 @@ public class WebsiteComplement {
         return new DownloadTask(DOWNLOAD_PLUGIN + pd.getDownload_path(), pd.getName(), SetupInit.getInstance().getDOWNLOAD_FOLDER());
     }
 
-    public long sendVersionRequest() {
+    public DownloadTask sendDownloadReuest(Long programm_version) {
+        return new DownloadTask(DOWNLOAD_PROGRAMM + programm_version, StaticData.ZIP_UPDATE_PROGRAMM_NAME, SetupInit.getInstance().getDOWNLOAD_FOLDER());
+    }
 
-        return 0;
+    public long sendVersionRequest() {
+        JsonObject jo = sendProgramUpdateRequest();
+        return jo != null ? jo.get("version").getAsLong() : -1;
     }
 }

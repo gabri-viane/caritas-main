@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import theopenhand.commons.connection.DatabaseConnection;
 import theopenhand.commons.events.graphics.ClickListener;
 import theopenhand.runtime.templates.ReferenceController;
 
@@ -20,7 +21,7 @@ import theopenhand.runtime.templates.ReferenceController;
  *
  * @author gabri
  */
-public class MainReference implements ReferenceController {
+public class MainReference extends ReferenceController {
 
     private static final MainReference mr = new MainReference();
 
@@ -52,6 +53,7 @@ public class MainReference implements ReferenceController {
         } catch (IOException ex) {
             Logger.getLogger(MainReference.class.getName()).log(Level.SEVERE, null, ex);
         }
+        rc.getServerLB().setText(DatabaseConnection.IP.split("[?]")[0]);
     }
 
     /**
