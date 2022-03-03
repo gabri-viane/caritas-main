@@ -47,12 +47,12 @@ public final class DatabaseConnection {
     /**
      *
      */
-    public static String USER = "";
+    public static String USER = "";//"superuser";
 
     /**
      *
      */
-    public static String PASSWORD = "";
+    public static String PASSWORD = "";//"rootpass";
 
     private boolean AUTOCOMMIT = false;
     private boolean SAVEONEXIT = true;

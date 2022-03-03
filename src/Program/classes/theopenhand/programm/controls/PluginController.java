@@ -15,7 +15,16 @@
  */
 package theopenhand.programm.controls;
 
+import java.util.ArrayList;
+import java.util.UUID;
+import javafx.scene.control.Alert;
+import theopenhand.installer.online.store.PluginDownloadData;
+import theopenhand.installer.online.store.PluginStore;
+import theopenhand.installer.utils.Installer;
+import theopenhand.installer.utils.WebConnection;
 import theopenhand.runtime.loader.Loader;
+import theopenhand.runtime.loader.folder.PluginFolderHandler;
+import theopenhand.window.graphics.dialogs.DialogCreator;
 
 /**
  *
@@ -39,9 +48,33 @@ public class PluginController {
             public void run() {
                 StaticExchange.LOADER = Loader.getInstance();
                 StaticExchange.LOADER.activate();
+                executeUpdate();
                 GUIControl.getInstance().rereshData();
             }
         };
         t.start();
+    }
+
+    private void update(ArrayList<UUID> toUpdate, int index) {
+        if (index < toUpdate.size()) {
+            UUID uuid = toUpdate.get(index);
+            PluginStore ps = PluginStore.getInstance();
+            PluginDownloadData plugin = ps.getPlugin(uuid);
+            WebConnection.DownloadTask download = ps.download(plugin);
+            GUIControl.getInstance().showDownloadTask(download, () -> {
+                Installer i = Installer.generate(download.getOutput(), PluginFolderHandler.getInstance());
+                i.installFrom(plugin);
+                update(toUpdate, index + 1);
+            });
+            new Thread(download).start();
+        } else if (!toUpdate.isEmpty()) {
+            DialogCreator.showAlert(Alert.AlertType.WARNING, "Plugin aggiornati", "Riavviare il programma per applicare gli aggiornamenti dei plugin.", null);
+        }
+    }
+
+    public void executeUpdate() {
+        PluginFolderHandler pfh = PluginFolderHandler.getInstance();
+        ArrayList<UUID> toUpdate = pfh.getToUpdate();
+        update(toUpdate, 0);
     }
 }

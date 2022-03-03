@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import theopenhand.commons.Pair;
 import theopenhand.installer.SetupInit;
 import theopenhand.installer.interfaces.PluginHandler;
+import theopenhand.installer.online.update.PluginAutoupdate;
 import theopenhand.runtime.ambient.DataEnvironment;
 import theopenhand.runtime.loader.Loader;
 import theopenhand.runtime.loader.folder.xml.DependsElement;
@@ -45,7 +46,7 @@ import ttt.utils.xml.io.XMLWriter;
  *
  * @author gabri
  */
-public class PluginFolderHandler implements PluginHandler{
+public class PluginFolderHandler implements PluginHandler {
 
     private static File XML_FILE;
     private XMLDocument main_doc;
@@ -55,6 +56,7 @@ public class PluginFolderHandler implements PluginHandler{
     private final HashMap<UUID, PluginLoaderElement> registered;
 
     private final HashMap<UUID, LinkedList<UUID>> dependes_on;
+    private final ArrayList<UUID> to_update = new ArrayList<>();
 
     private static PluginFolderHandler instance;
 
@@ -116,23 +118,30 @@ public class PluginFolderHandler implements PluginHandler{
         not_found.clear();
         main_doc.getRoot().getElements().forEach(e -> {
             PluginLoaderElement pe = (PluginLoaderElement) e;
+            PluginAutoupdate pa = new PluginAutoupdate(pe.getUUID());
+            int v = Integer.parseInt(pe.getVersion());
             registerDeps(pe);
             registered.put(pe.getUUID(), pe);
-            String file_path = pe.getFile_path();
-            File f = new File(file_path);
-            if (f.exists() && f.isFile() && f.getName().endsWith(".jar")) {
-                try {
-                    JarFile jf = new JarFile(f);
-                    Manifest manifest = jf.getManifest();
-                    if (manifest != null) {
-                        plugin_files.add(new Pair(f, pe));
+            //Se non è da aggiornare lo carico, altrimenti lo aggiungo alla lista da scaricare
+            if (!pa.toUpdate(v)) {
+                String file_path = pe.getFile_path();
+                File f = new File(file_path);
+                if (f.exists() && f.isFile() && f.getName().endsWith(".jar")) {
+                    try {
+                        JarFile jf = new JarFile(f);
+                        Manifest manifest = jf.getManifest();
+                        if (manifest != null) {
+                            plugin_files.add(new Pair(f, pe));
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(PluginFolderHandler.class.getName()).log(Level.SEVERE, null, ex);
+                        not_found.add(pe);
                     }
-                } catch (IOException ex) {
-                    Logger.getLogger(PluginFolderHandler.class.getName()).log(Level.SEVERE, null, ex);
+                } else {
                     not_found.add(pe);
                 }
             } else {
-                not_found.add(pe);
+                to_update.add(pa.getUUID());
             }
         });
         return new Pair(plugin_files, not_found);
@@ -192,7 +201,13 @@ public class PluginFolderHandler implements PluginHandler{
      */
     @Override
     public void addPluginData(File f, String name, String path_to_class, String ver, UUID uid, ArrayList<UUID> dependencies) {
-        if (f != null && name != null && path_to_class != null && uid != null && dependencies != null) {
+        if (registered.containsKey(uid)) {
+            PluginLoaderElement pl = registered.get(uid);
+            pl.setPlugin_name(name);
+            pl.setFile_path(f.getAbsolutePath());
+            pl.setClass_path(path_to_class);
+            pl.setVersion(ver);
+        } else if (f != null && name != null && path_to_class != null && uid != null && dependencies != null) {
             PluginLoaderElement pl = new PluginLoaderElement(f.getAbsolutePath(), name, path_to_class, ver, uid);
             pl.addDependencies(dependencies);
             registerDeps(pl);
@@ -255,6 +270,10 @@ public class PluginFolderHandler implements PluginHandler{
     @Override
     public boolean installed(UUID uid) {
         return registered.containsKey(uid);
+    }
+
+    public ArrayList<UUID> getToUpdate() {
+        return to_update;
     }
 
 }

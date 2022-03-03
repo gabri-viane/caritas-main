@@ -1,0 +1,47 @@
+/*
+ * Copyright 2022 gabri.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package theopenhand.programm.window.ribbon.group;
+
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+
+/**
+ *
+ * @author gabri
+ */
+public class RibbonGroup extends VBox {
+
+    private final HBox main;
+    private final Label groupTitle;
+
+    public RibbonGroup(String title) {
+        super();
+        setPrefHeight(70);
+        setPrefWidth(USE_COMPUTED_SIZE);
+        setMaxHeight(100);
+        setMaxWidth(Double.MAX_VALUE);
+        setMinHeight(70);
+        setMinWidth(50);
+        setSpacing(5);
+        groupTitle = new Label(title);
+        groupTitle.setTextFill(Color.DARKGREY);
+        main = new HBox();
+        getChildren().addAll(main, groupTitle);
+    }
+
+}

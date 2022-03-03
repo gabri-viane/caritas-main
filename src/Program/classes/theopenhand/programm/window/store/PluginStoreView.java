@@ -181,7 +181,7 @@ public class PluginStoreView extends AnchorPane {
         noSelection();
     }
 
-    private void refresh() {
+    public void refresh() {
         dc.forceRefresh((args) -> {
             Platform.runLater(() -> {
                 ObservableList<PluginDownloadData> items = pluginsTable.getItems();
@@ -191,7 +191,6 @@ public class PluginStoreView extends AnchorPane {
             });
             return null;
         });
-
     }
 
     private void noSelection() {

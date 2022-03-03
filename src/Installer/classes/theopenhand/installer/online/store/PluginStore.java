@@ -45,6 +45,7 @@ public class PluginStore {
     public static PluginStore getInstance() {
         if (instance == null) {
             instance = new PluginStore();
+            instance.refresh();
         }
         return instance;
     }

@@ -16,11 +16,11 @@ import theopenhand.commons.handlers.MainWindowEventsHandler;
 import theopenhand.installer.SetupInit;
 import theopenhand.installer.data.ConnectionData;
 import theopenhand.installer.data.ProgrammData;
+import theopenhand.installer.online.store.PluginStore;
 import theopenhand.programm.controls.GUIControl;
 import theopenhand.programm.controls.PluginController;
 import theopenhand.programm.controls.StaticExchange;
 import theopenhand.programm.controls.UpdateControl;
-import theopenhand.programm.window.store.PluginStoreView;
 import theopenhand.statics.privates.StaticReferencesPvt;
 import theopenhand.window.graphics.dialogs.DialogCreator;
 import theopenhand.window.hand.MainActivityCTRL;
@@ -38,6 +38,7 @@ public class TheOpenHand extends Application {
         } catch (IOException ex) {
             Logger.getLogger(TheOpenHand.class.getName()).log(Level.SEVERE, null, ex);
         }*/
+        PluginStore.getInstance();
         SetupInit.getInstance();
         ProgrammData.getInstance();
         ConnectionData.getInstance();
@@ -74,9 +75,6 @@ public class TheOpenHand extends Application {
         } else {
             DialogCreator.showAlert(Alert.AlertType.WARNING, "Connessione fallita", "Non è stato possibile stabilire una connessione al database.\nI Plugins e le funzionalità aggiuntive non saranno caricate.", null);
         }
-
-        PluginStoreView psv = new PluginStoreView();
-        activityCTRL.getMainContainerBP().setCenter(psv);
     }
 
     /**

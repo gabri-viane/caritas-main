@@ -109,6 +109,7 @@ public class ConnectionData {
         AddressElement pe = (AddressElement) doc.getRoot().getFirstElement("address");
         CredentialsElement ce = (CredentialsElement) doc.getRoot().getFirstElement("credentials");
         showDialog(pe, ce);
+        DialogCreator.showAlert(Alert.AlertType.WARNING, "Per procedere", "Per applicare le modifiche riavviare il programma.", null);
     }
 
     private void showDialog(AddressElement pe, CredentialsElement ce) {

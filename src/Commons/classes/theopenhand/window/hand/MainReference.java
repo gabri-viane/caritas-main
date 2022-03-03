@@ -54,6 +54,7 @@ public class MainReference extends ReferenceController {
             Logger.getLogger(MainReference.class.getName()).log(Level.SEVERE, null, ex);
         }
         rc.getServerLB().setText(DatabaseConnection.IP.split("[?]")[0]);
+        rc.getUserLB().setText(DatabaseConnection.USER);
     }
 
     /**

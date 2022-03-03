@@ -21,4 +21,5 @@ module Program {
     opens theopenhand.programm to javafx.graphics, javafx.fxml;
     opens theopenhand.programm.window.plugins to javafx.graphics, javafx.fxml;
     opens theopenhand.programm.window.store to javafx.graphics, javafx.fxml;
+    opens theopenhand.programm.window.homepage to javafx.graphics, javafx.fxml;
 }

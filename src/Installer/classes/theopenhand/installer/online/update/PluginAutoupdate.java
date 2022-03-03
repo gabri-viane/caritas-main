@@ -40,32 +40,23 @@ public class PluginAutoupdate {
         }
     }
 
-    public int compare(Integer installed_ver) {
-        if (online_data != null) {
-            if (installed_ver != null) {
-                Integer online_ver = online_data.getVersion();
-                if (online_ver != null) {
-                    if (online_ver.intValue() == installed_ver.intValue()) {
-                        return 0;
-                    } else if (online_ver > installed_ver) {
-                        return -1;
-                    } else if (online_ver < installed_ver) {
-                        return 1;
-                    }
-                }
-                return 1;
-            }
-            return -1;
+    public boolean toUpdate(Integer version) {
+        if (online_data != null && version != null) {
+            return online_data.getVersion() > version;
         }
-        return 0;
+        return false;
     }
 
     public WebConnection.DownloadTask update(Integer version) {
-        if (compare(version) == -1) {
+        if (toUpdate(version)) {
             WebConnection.DownloadTask download = PluginStore.getInstance().download(online_data);
             return download;
         }
         return null;
+    }
+
+    public UUID getUUID() {
+        return plugin_uuid;
     }
 
 }
