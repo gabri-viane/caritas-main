@@ -5,10 +5,7 @@
  */
 package theopenhand.commons.handlers;
 
-import javafx.application.Platform;
 import javafx.scene.Node;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.TitledPane;
 import theopenhand.commons.events.graphics.ClickHandler;
 import theopenhand.commons.events.graphics.ComponentHandler;
 import theopenhand.window.hand.MainActivityCTRL;
@@ -49,7 +46,7 @@ public class MainWindowEventsHandler {
     }
 
     private void initAll() {
-        LATERAL_MENU_BUTTON_HANDLER.addListener(() -> wndw_controller.getCollapseLateralMenu().fire());
+//        LATERAL_MENU_BUTTON_HANDLER.addListener(() -> wndw_controller.getCollapseLateralMenu().fire());
         MENU_PLUGIN_SETTINGS_HANDLER.addListener(() -> wndw_controller.getPluginSettingsBtn().fire());
     }
 
@@ -57,23 +54,23 @@ public class MainWindowEventsHandler {
      *
      * @param b
      */
-    public void addLateralTitledPane(TitledPane b) {
-        Accordion a = wndw_controller.getPanesOptionContainer();
-        Platform.runLater(() -> {
-            a.getPanes().add(b);
-        });
-        GENERAL_COMPONENT_HANDLER.addedComponent(a, b);
-    }
+//    public void addLateralTitledPane(TitledPane b) {
+//        Accordion a = wndw_controller.getPanesOptionContainer();
+//        Platform.runLater(() -> {
+//            a.getPanes().add(b);
+//        });
+//        GENERAL_COMPONENT_HANDLER.addedComponent(a, b);
+//    }
 
     /**
      *
      * @param b
      */
-    public void removeLateralTitledPane(TitledPane b) {
-        Accordion a = wndw_controller.getPanesOptionContainer();
-        a.getPanes().remove(b);
-        GENERAL_COMPONENT_HANDLER.removedComponent(a, b);
-    }
+//    public void removeLateralTitledPane(TitledPane b) {
+//        Accordion a = wndw_controller.getPanesOptionContainer();
+//        a.getPanes().remove(b);
+//        GENERAL_COMPONENT_HANDLER.removedComponent(a, b);
+//    }
 
     /**
      *

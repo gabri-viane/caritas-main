@@ -9,6 +9,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Accordion;
+import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
@@ -16,19 +18,23 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * FXML Controller class
  *
  * @author gabri
  */
-public class MainActivityCTRL implements Initializable {
+public class OldMACTRL implements Initializable {
 
  @FXML
     private MenuItem aboutMenuBtn;
 
     @FXML
     private HBox belowContainer;
+
+    @FXML
+    private Button collapseLateralMenu;
 
     @FXML
     private MenuItem connDBMenuBtn;
@@ -61,6 +67,9 @@ public class MainActivityCTRL implements Initializable {
     private MenuItem forceRollbackMEnuBtn;
 
     @FXML
+    private VBox lateralMenuVB;
+
+    @FXML
     private BorderPane mainContainerBP;
 
     @FXML
@@ -68,6 +77,9 @@ public class MainActivityCTRL implements Initializable {
 
     @FXML
     private MenuBar mainMenuBar;
+
+    @FXML
+    private Accordion panesOptionContainer;
 
     @FXML
     private Label pluginCounterLB;
@@ -118,9 +130,21 @@ public class MainActivityCTRL implements Initializable {
     }
 
     private void initListeners() {
-        
+        collapseLateralMenu.setOnMouseClicked((t) -> {
+            collapseLateralHandler();
+        });
     }
 
+    private void collapseLateralHandler() {
+        boolean visible = lateralMenuVB.isVisible();
+        double size = visible ? 0 : 300;
+        String text = visible ? ">" : "<";
+        collapseLateralMenu.setText(text);
+        lateralMenuVB.setVisible(!visible);
+        lateralMenuVB.setPrefWidth(size);
+        lateralMenuVB.setMaxWidth(size);
+        lateralMenuVB.setMinWidth(size);
+    }
 
     /**
      *
@@ -136,6 +160,30 @@ public class MainActivityCTRL implements Initializable {
      */
     public BorderPane getMainContainerBP() {
         return mainContainerBP;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public VBox getLateralMenuVB() {
+        return lateralMenuVB;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Accordion getPanesOptionContainer() {
+        return panesOptionContainer;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Button getCollapseLateralMenu() {
+        return collapseLateralMenu;
     }
 
     /**

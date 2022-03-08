@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="600.0" styleClass="anchor-pane-shadowed" type="AnchorPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox maxHeight="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+               <children>
+                  <TabPane fx:id="mainTP" maxHeight="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" tabMaxWidth="80.0" tabMinWidth="80.0" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <Separator maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER" />
+         </children>
+      </VBox>
+   </children>
+</fx:root>

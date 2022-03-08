@@ -83,7 +83,7 @@ public final class DatabaseConnection {
      *
      */
     public void hookShutdown() {
-        StaticReferences.subscribeOnExit((Object... args) -> {
+        StaticReferences.subscribeOnExit(() -> {
             try {
                 if (DBConn != null && DBConn.getMetaData() != null) {
                     DISCONNECT();
@@ -91,7 +91,6 @@ public final class DatabaseConnection {
             } catch (SQLException ex) {
                 //ALLORA la connessione è già stata terminata
             }
-            return null;
         });
     }
 
@@ -130,8 +129,8 @@ public final class DatabaseConnection {
             //TODO : Aggiungi eccezione autocommit
         }
     }
-    
-    public void commit(){
+
+    public void commit() {
         try {
             DBConn.commit();
         } catch (SQLException ex) {

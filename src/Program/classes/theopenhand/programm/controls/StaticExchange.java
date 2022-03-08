@@ -41,4 +41,8 @@ public class StaticExchange {
         StaticExchange.MAC = MAC;
     }
 
+    public static Loader getLOADER() {
+        return LOADER;
+    }
+
 }

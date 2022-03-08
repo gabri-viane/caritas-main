@@ -55,13 +55,16 @@ public class ConnectionData {
             XMLEngine eng = new XMLEngine(f, RootElement.class, AddressElement.class, CredentialsElement.class);
             eng.morph(doc);
             initData();
-            StaticReferences.subscribeOnExit((args) -> {
-                writer.writeDocument(doc, true);
-                return null;
+            StaticReferences.subscribeOnExit(() -> {
+                flush();
             });
         } catch (IOException ex) {
             Logger.getLogger(ProgrammData.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void flush() {
+        writer.writeDocument(doc, true);
     }
 
     public static ConnectionData getInstance() {

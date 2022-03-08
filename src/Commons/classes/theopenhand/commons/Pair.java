@@ -19,8 +19,8 @@ public class Pair<K, V> {
 
     /**
      *
-     * @param k
-     * @param v
+     * @param key
+     * @param value
      */
     public Pair(K key, V value) {
         this.key = key;

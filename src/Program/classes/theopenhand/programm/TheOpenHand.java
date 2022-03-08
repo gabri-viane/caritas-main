@@ -21,6 +21,7 @@ import theopenhand.programm.controls.GUIControl;
 import theopenhand.programm.controls.PluginController;
 import theopenhand.programm.controls.StaticExchange;
 import theopenhand.programm.controls.UpdateControl;
+import theopenhand.programm.window.Ribbon;
 import theopenhand.statics.privates.StaticReferencesPvt;
 import theopenhand.window.graphics.dialogs.DialogCreator;
 import theopenhand.window.hand.MainActivityCTRL;
@@ -69,6 +70,7 @@ public class TheOpenHand extends Application {
         stage.show();
 
         GUIControl.getInstance().initKeybinds();
+        new Ribbon().inject();
 
         if (StaticReferences.dbconn.isConnected()) {
             PluginController.getInstance().load();

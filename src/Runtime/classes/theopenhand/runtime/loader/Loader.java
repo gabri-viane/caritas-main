@@ -158,6 +158,9 @@ public class Loader {
             loadClass(ctor, id);
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
             Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
+        }catch(java.lang.IncompatibleClassChangeError ce){
+            PluginFolderHandler.getInstance().removePluginData(p.getValue());
+            p.getKey().deleteOnExit();
         }
     }
 
@@ -181,7 +184,7 @@ public class Loader {
      *
      * @return
      */
-    public Set<UUID> getUUIDS() {
+    public synchronized Set<UUID> getUUIDS() {
         return loaded_classes.keySet();
     }
 

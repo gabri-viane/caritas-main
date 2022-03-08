@@ -29,7 +29,6 @@ import theopenhand.runtime.SubscriptionHandler;
 import theopenhand.runtime.connection.runtime.engine.ConnectionEngine;
 import theopenhand.runtime.connection.runtime.engine.EngineBuilder;
 import theopenhand.runtime.templates.RuntimeReference;
-import theopenhand.window.resources.handler.PluginBinder;
 
 /**
  *
@@ -111,9 +110,6 @@ public class DBResultLoader {
      * <br>
      * Successivamente rimuove tutti i {@link ConnectionEngine} associati alle
      * classi registrate.
-     * <br>
-     * Infine viene chiamata la funzione {@link PluginBinder#unload(theopenhand.runtime.templates.RuntimeReference)
-     * }.
      *
      * @param rr La {@link RuntimeReference} da scaricare (disattivare per la
      * sessione corrente).
@@ -126,7 +122,6 @@ public class DBResultLoader {
                 eb.removeConnectionEngine(p.getKey());
             });
         }
-        PluginBinder.unload(rr);
     }
 
 }

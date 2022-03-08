@@ -21,18 +21,22 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import theopenhand.commons.connection.DatabaseConnection;
+import theopenhand.commons.events.programm.utils.ListEventListener;
 import theopenhand.installer.data.ConnectionData;
 import theopenhand.installer.data.Version;
 import theopenhand.installer.online.update.ProgrammAutoupdate;
 import theopenhand.installer.utils.WebConnection;
+import theopenhand.programm.window.Ribbon;
 import theopenhand.programm.window.homepage.HomepageScene;
 import theopenhand.programm.window.plugins.PluginForm;
+import theopenhand.window.graphics.ribbon.elements.RibbonBar;
 import theopenhand.programm.window.store.PluginStoreView;
+import theopenhand.runtime.SubscriptionHandler;
 import theopenhand.runtime.loader.Loader;
+import theopenhand.runtime.templates.RuntimeReference;
 import theopenhand.statics.StaticReferences;
 import theopenhand.window.graphics.dialogs.DialogCreator;
-import theopenhand.window.resources.handler.PluginBinder;
+import theopenhand.window.graphics.ribbon.RibbonFactory;
 
 /**
  *
@@ -42,13 +46,34 @@ public class GUIControl {
 
     private static final GUIControl instance = new GUIControl();
     private PluginStoreView psv;
+    private RibbonBar rb;
 
     private GUIControl() {
         init();
     }
 
+    public void showStore() {
+        if (psv == null) {
+            psv = new PluginStoreView();
+        }
+        psv.refresh();
+        StaticExchange.MAC.getMainContainerBP().setCenter(psv);
+    }
+
     private void init() {
         StaticExchange.MAC.getMainContainerBP().setCenter(HomepageScene.getInstance());
+        rb = new RibbonBar();
+        StaticExchange.MAC.getMainContainerBP().setTop(rb);
+        SubscriptionHandler.addListener(new ListEventListener<RuntimeReference>() {
+            @Override
+            public void onElementAdded(RuntimeReference element) {
+                refreshData();
+            }
+
+            @Override
+            public void onElementRemoved(RuntimeReference element) {
+            }
+        });
     }
 
     public static GUIControl getInstance() {
@@ -59,24 +84,29 @@ public class GUIControl {
         StaticReferences.getMainWindowScene().addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) -> {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
-                    case F1 -> {
+                    case S -> {
+                        if (event.isControlDown()) {
+                            Ribbon.saveDatabase();
+                            event.consume();
+                        }
+                    }
+                    case F2 -> {
                         BorderPane mainContainerBP = StaticExchange.MAC.getMainContainerBP();
-                        if (mainContainerBP.getTop() != null) {
-                            mainContainerBP.setTop(null);
-                        } else {
+                        if (mainContainerBP.getTop() == rb) {
                             mainContainerBP.setTop(StaticExchange.MAC.getMainMenuBar());
+                        } else {
+                            mainContainerBP.setTop(rb);
                         }
                         event.consume();
                     }
-                    case F2 -> {
-                        if (psv == null) {
-                            psv = new PluginStoreView();
-                        }
-                        psv.refresh();
-                        StaticExchange.MAC.getMainContainerBP().setCenter(psv);
+                    case F1 -> {
+                        showStore();
+                        event.consume();
                     }
-                    case F3 ->
+                    case F3 -> {
                         StaticExchange.MAC.getConnSetupBTN().fire();
+                        event.consume();
+                    }
                     default -> {
                     }
                 }
@@ -104,14 +134,15 @@ public class GUIControl {
             Platform.exit();
         });
         showRestart(false);
+
     }
 
-    public void rereshData() {
+    public void refreshData() {
         Platform.runLater(() -> {
-            PluginBinder.loadAll();
+            //PluginBinder.loadAll();
             Loader l = StaticExchange.LOADER;
-            PluginForm pfcntrl = new PluginForm(l);
-            StaticExchange.MAC.getPluginSettingsBtn().setOnAction((a) -> StaticReferences.getMainWindowReference().setCenterNode(pfcntrl));
+            RibbonFactory.load(rb);
+            StaticExchange.MAC.getPluginSettingsBtn().setOnAction((a) -> StaticReferences.getMainWindowReference().setCenterNode(new PluginForm(l)));
             StaticExchange.MAC.getPluginCounterLB().setText("" + l.getUUIDS().size());
         });
     }

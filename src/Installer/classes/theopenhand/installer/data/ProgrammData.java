@@ -51,13 +51,16 @@ public class ProgrammData {
             XMLEngine eng = new XMLEngine(f, RootElement.class, ProgrammElement.class);
             eng.morph(doc);
             initData();
-            StaticReferences.subscribeOnExit((args) -> {
-                writer.writeDocument(doc, true);
-                return null;
+            StaticReferences.subscribeOnExit(() -> {
+                flush();
             });
         } catch (IOException ex) {
             Logger.getLogger(ProgrammData.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void flush(){
+        writer.writeDocument(doc, true);
     }
 
     public static ProgrammData getInstance() {
@@ -74,8 +77,8 @@ public class ProgrammData {
             //Ho la versione del programma
             if (!Objects.equals(pe.getVersion(), Version.serialVersionUID)) {
                 //Versioni diverse: se questa è maggiore sostituisco
-                 pe.setVersion(Version.serialVersionUID);
-                 //(procedimento nel caso di programma aggiornato)
+                pe.setVersion(Version.serialVersionUID);
+                //(procedimento nel caso di programma aggiornato)
             }
         } else {
             //Installazione nuova

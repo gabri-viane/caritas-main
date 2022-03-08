@@ -13,7 +13,6 @@ module Runtime {
     requires java.logging;
     requires Utils;
 
-    exports theopenhand.window.resources.handler to Program;
     exports theopenhand.window.resources.ui to Program;
     exports theopenhand.window.resources.ui.settings.plugins to Program;
 

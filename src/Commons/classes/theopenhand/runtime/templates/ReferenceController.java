@@ -5,7 +5,9 @@
  */
 package theopenhand.runtime.templates;
 
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
 import theopenhand.commons.events.graphics.ClickListener;
 
@@ -23,31 +25,6 @@ public abstract class ReferenceController<R extends ResultHolder> {
      * @return
      */
     public abstract String getID();
-
-    /**
-     *
-     * @param <T>
-     * @return
-     */
-    public abstract <T extends Parent> T getNode();
-
-    /**
-     *
-     * @return
-     */
-    public abstract ClickListener getOnAssocButtonClick();
-
-    /**
-     *
-     * @return
-     */
-    public abstract String getAssocButtonName();
-
-    /**
-     *
-     * @return
-     */
-    public abstract String getGroupName();
 
     public final void setRH(ResultHolder rs) {
         this.rs_instance = (R) rs;

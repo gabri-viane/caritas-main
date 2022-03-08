@@ -10,11 +10,9 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import theopenhand.commons.connection.DatabaseConnection;
-import theopenhand.commons.events.graphics.ClickListener;
 import theopenhand.runtime.templates.ReferenceController;
 
 /**
@@ -49,6 +47,7 @@ public class MainReference extends ReferenceController {
             MainActivityCTRL controller = loader.getController();
 
             this.s = new Scene(root);
+            s.getStylesheets().add(getClass().getResource("/theopenhand/window/resources/sheets/ProgrammStylesheet.css").toExternalForm());
             rc = controller;
         } catch (IOException ex) {
             Logger.getLogger(MainReference.class.getName()).log(Level.SEVERE, null, ex);
@@ -78,45 +77,7 @@ public class MainReference extends ReferenceController {
      *
      * @return
      */
-    @Override
-    public Parent getNode() {
-        return s.getRoot();
-    }
-
-    /**
-     *
-     * @return
-     */
     public Scene getScene() {
         return s;
     }
-
-    /**
-     *
-     * @return
-     */
-    @Override
-    public ClickListener getOnAssocButtonClick() {
-        return () -> {
-        };
-    }
-
-    /**
-     *
-     * @return
-     */
-    @Override
-    public String getAssocButtonName() {
-        return "Home";
-    }
-
-    /**
-     *
-     * @return
-     */
-    @Override
-    public String getGroupName() {
-        return "Programma";
-    }
-
 }

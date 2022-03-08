@@ -21,22 +21,22 @@
                      <children>
                         <HBox maxWidth="1.7976931348623157E308">
                            <children>
-                              <Label text="Premi:" HBox.hgrow="NEVER">
+                              <Label styleClass="h4" text="Premi:" HBox.hgrow="NEVER">
                                  <font>
                                     <Font size="18.0" />
                                  </font>
                               </Label>
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" spacing="2.0">
+                        <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="37.0" spacing="2.0">
                            <children>
                               <Separator orientation="VERTICAL" />
-                              <Label text="F1">
+                              <Label styleClass="h3" text="F1">
                                  <font>
                                     <Font size="24.0" />
                                  </font>
                               </Label>
-                              <Label text="Per aprire le impostazioni" HBox.hgrow="ALWAYS">
+                              <Label styleClass="h5" text="Per visualizzare e installare nuovi plugin" HBox.hgrow="ALWAYS">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -46,15 +46,15 @@
                               <Insets left="10.0" />
                            </padding>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="37.0" spacing="2.0">
+                        <HBox alignment="CENTER_LEFT" spacing="2.0">
                            <children>
                               <Separator orientation="VERTICAL" />
-                              <Label text="F2">
+                              <Label styleClass="h3" text="F2">
                                  <font>
                                     <Font size="24.0" />
                                  </font>
                               </Label>
-                              <Label text="Per visualizzare e installare nuovi plugin" HBox.hgrow="ALWAYS">
+                              <Label styleClass="h5" text="Per navigare tra le opzioni e le impostazioni" HBox.hgrow="ALWAYS">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -67,12 +67,12 @@
                         <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="72.0" spacing="2.0">
                            <children>
                               <Separator orientation="VERTICAL" />
-                              <Label text="F3">
+                              <Label styleClass="h3" text="F3">
                                  <font>
                                     <Font size="24.0" />
                                  </font>
                               </Label>
-                              <Label text="Per modificare le impostazioni di connessione" HBox.hgrow="ALWAYS">
+                              <Label styleClass="h5" text="Per modificare le impostazioni di connessione" HBox.hgrow="ALWAYS">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -94,7 +94,7 @@
             <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="60.0" spacing="10.0">
                <children>
                   <ImageView fx:id="iconGestor" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER" />
-                  <Label text="Benvenuto, per cominciare:">
+                  <Label maxWidth="1.7976931348623157E308" styleClass="h1" text="Benvenuto, per cominciare:" HBox.hgrow="ALWAYS">
                      <font>
                         <Font size="32.0" />
                      </font>

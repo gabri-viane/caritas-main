@@ -26,7 +26,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import theopenhand.statics.StaticReferences;
 
 /**
  * FXML Controller class
@@ -109,7 +108,7 @@ public final class OptionGroup extends TitledPane {
         buttons.remove(b);
         this.buttonContainer.getChildren().remove(b);
         if(buttons.isEmpty()){
-            StaticReferences.getMainWindowReference().removeLateralTitledPane(this);
+            //StaticReferences.getMainWindowReference().removeLateralTitledPane(this);
         }
     }
 
@@ -120,7 +119,7 @@ public final class OptionGroup extends TitledPane {
     public void removeButton(int index) {
         this.buttonContainer.getChildren().remove(buttons.remove(index));
         if(buttons.isEmpty()){
-            StaticReferences.getMainWindowReference().removeLateralTitledPane(this);
+            //StaticReferences.getMainWindowReference().removeLateralTitledPane(this);
         }
     }
 

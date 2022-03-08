@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.programm.window.ribbon.group;
+package theopenhand.window.graphics.ribbon.elements;
 
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+import theopenhand.runtime.templates.RuntimeReference;
 
 /**
  *
@@ -28,20 +30,33 @@ public class RibbonGroup extends VBox {
 
     private final HBox main;
     private final Label groupTitle;
+    private final RuntimeReference reference;
 
-    public RibbonGroup(String title) {
+    protected RibbonGroup(RuntimeReference rr, String title) {
         super();
+        reference = rr;
         setPrefHeight(70);
         setPrefWidth(USE_COMPUTED_SIZE);
         setMaxHeight(100);
         setMaxWidth(Double.MAX_VALUE);
-        setMinHeight(70);
+        setMinHeight(USE_COMPUTED_SIZE);
         setMinWidth(50);
         setSpacing(5);
         groupTitle = new Label(title);
-        groupTitle.setTextFill(Color.DARKGREY);
         main = new HBox();
+        main.setSpacing(5);
+        VBox.setVgrow(main, Priority.ALWAYS);
+        VBox.setVgrow(groupTitle, Priority.NEVER);
         getChildren().addAll(main, groupTitle);
+    }
+
+    public RibbonGroup addNode(Node n) {
+        main.getChildren().add(n);
+        return this;
+    }
+
+    public RuntimeReference getRuntimeReference() {
+        return reference;
     }
 
 }

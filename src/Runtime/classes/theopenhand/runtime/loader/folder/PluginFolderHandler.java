@@ -36,6 +36,8 @@ import theopenhand.runtime.loader.Loader;
 import theopenhand.runtime.loader.folder.xml.DependsElement;
 import theopenhand.runtime.loader.folder.xml.PluginLoaderElement;
 import theopenhand.runtime.loader.folder.xml.PluginsLoaderElement;
+import theopenhand.runtime.templates.LinkableClass;
+import theopenhand.statics.StaticReferences;
 import ttt.utils.xml.document.XMLDocument;
 import ttt.utils.xml.engine.XMLEngine;
 import ttt.utils.xml.engine.interfaces.IXMLElement;
@@ -54,6 +56,7 @@ public class PluginFolderHandler implements PluginHandler {
     private final ArrayList<Pair<File, PluginLoaderElement>> plugin_files;
     private final ArrayList<PluginLoaderElement> not_found;
     private final HashMap<UUID, PluginLoaderElement> registered;
+    private final ArrayList<PluginLoaderElement> load_order;
 
     private final HashMap<UUID, LinkedList<UUID>> dependes_on;
     private final ArrayList<UUID> to_update = new ArrayList<>();
@@ -63,14 +66,12 @@ public class PluginFolderHandler implements PluginHandler {
     private PluginFolderHandler() {
         plugin_files = new ArrayList<>();
         not_found = new ArrayList<>();
+        load_order = new ArrayList<>();
         registered = new HashMap<>();
         dependes_on = new HashMap<>();
         init();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                flush();
-            }
+        StaticReferences.subscribeOnExit(() -> {
+            flush();
         });
     }
 
@@ -131,6 +132,7 @@ public class PluginFolderHandler implements PluginHandler {
                         JarFile jf = new JarFile(f);
                         Manifest manifest = jf.getManifest();
                         if (manifest != null) {
+                            load_order.add(pe);
                             plugin_files.add(new Pair(f, pe));
                         }
                     } catch (IOException ex) {
@@ -145,6 +147,15 @@ public class PluginFolderHandler implements PluginHandler {
             }
         });
         return new Pair(plugin_files, not_found);
+    }
+
+    public ArrayList<PluginLoaderElement> getLoadOrder(){
+        return load_order;
+    }
+    
+    public void reorder(ArrayList<PluginLoaderElement> ple) {
+        main_doc.getRoot().getElements().clear();
+        main_doc.getRoot().getElements().addAll(ple);
     }
 
     private void registerDeps(PluginLoaderElement pe) {
@@ -236,7 +247,10 @@ public class PluginFolderHandler implements PluginHandler {
         }).findFirst();
         findFirst.ifPresent((t) -> {
             PluginLoaderElement pe = (PluginLoaderElement) t;
-            Loader.getInstance().findLinkedClass(uuid).unload();
+            LinkableClass ps = Loader.getInstance().findLinkedClass(uuid);
+            if(ps!=null){
+                ps.unload();
+            }
             main_doc.getRoot().removeSubElement(pe);
             registered.remove(pe.getUUID());
         });

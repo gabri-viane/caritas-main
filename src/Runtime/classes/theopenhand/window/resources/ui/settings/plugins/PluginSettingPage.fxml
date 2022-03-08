@@ -55,7 +55,7 @@
                   <HBox spacing="10.0" VBox.vgrow="NEVER">
                      <children>
                         <Label text="Nome plugin:" HBox.hgrow="NEVER" />
-                        <Label fx:id="nameLBL" maxWidth="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS" />
+                        <Label fx:id="nameLBL" maxWidth="1.7976931348623157E308" styleClass="element" text="Label" HBox.hgrow="ALWAYS" />
                      </children>
                      <VBox.margin>
                         <Insets />
@@ -67,7 +67,7 @@
                   <HBox layoutX="10.0" layoutY="20.0" spacing="10.0">
                      <children>
                         <Label text="Attivo:" HBox.hgrow="NEVER" />
-                        <Label fx:id="activeLBL" maxWidth="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS" />
+                        <Label fx:id="activeLBL" maxWidth="1.7976931348623157E308" styleClass="element" text="Label" HBox.hgrow="ALWAYS" />
                      </children>
                      <padding>
                         <Insets left="10.0" />
@@ -76,7 +76,7 @@
                   <HBox layoutX="10.0" layoutY="38.0" spacing="10.0">
                      <children>
                         <Label text="Riferimenti aggiunti:" HBox.hgrow="NEVER" />
-                        <Label fx:id="ref_countLBL" maxWidth="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS" />
+                        <Label fx:id="ref_countLBL" maxWidth="1.7976931348623157E308" styleClass="element" text="Label" HBox.hgrow="ALWAYS" />
                      </children>
                      <padding>
                         <Insets left="10.0" />
@@ -85,7 +85,7 @@
                   <HBox layoutX="10.0" layoutY="56.0" spacing="10.0">
                      <children>
                         <Label text="Versione:" HBox.hgrow="NEVER" />
-                        <Label fx:id="versionLBL" maxWidth="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS" />
+                        <Label fx:id="versionLBL" maxWidth="1.7976931348623157E308" styleClass="element" text="Label" HBox.hgrow="ALWAYS" />
                      </children>
                      <padding>
                         <Insets left="10.0" />

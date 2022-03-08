@@ -49,7 +49,7 @@ public class PluginController {
                 StaticExchange.LOADER = Loader.getInstance();
                 StaticExchange.LOADER.activate();
                 executeUpdate();
-                GUIControl.getInstance().rereshData();
+                GUIControl.getInstance().refreshData();
             }
         };
         t.start();

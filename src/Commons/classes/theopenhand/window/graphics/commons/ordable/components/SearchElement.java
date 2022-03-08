@@ -56,6 +56,9 @@ public class SearchElement<T extends BindableResult> extends HBox implements Val
     @FXML
     private ChoiceBox<ClauseData> optionsCB;
 
+    @FXML
+    private HBox subContainerHB;
+
     private final Field assoc;
     private final QueryCustom qc_assoc;
     private final Clause cl;
@@ -159,7 +162,7 @@ public class SearchElement<T extends BindableResult> extends HBox implements Val
         optionsCB.setOnShown((t) -> {
             this.fieldSelectorCB.setSelected(true);
         });
-        this.getChildren().add(n);
+        subContainerHB.getChildren().add(n);
     }
 
     public void storeValue(Object value) {
@@ -176,10 +179,10 @@ public class SearchElement<T extends BindableResult> extends HBox implements Val
         return this.fieldSelectorCB.isSelected();
     }
 
-    public void setInstance(T instance){
+    public void setInstance(T instance) {
         this.instance = instance;
     }
-    
+
     @Override
     public Clause getValue() {
         on_req.onClick();
