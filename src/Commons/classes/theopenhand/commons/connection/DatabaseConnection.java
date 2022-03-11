@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import theopenhand.statics.StaticReferences;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  * <p>

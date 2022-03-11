@@ -50,15 +50,14 @@ module Commons {
     exports theopenhand.commons.programm.loader;
 
     exports theopenhand.window.graphics.inner;
-    exports theopenhand.window.graphics.dialogs;
+    exports theopenhand.window.graphics.creators;
     exports theopenhand.window.graphics.commons;
     exports theopenhand.window.graphics.ribbon;
     exports theopenhand.window.graphics.commons.ordable;
     exports theopenhand.window.graphics.ribbon.elements;
 
-    exports theopenhand.window.objects;
     exports theopenhand.runtime.block to Program, Runtime, Installer;
-    exports theopenhand.window.hand to Program;
+    exports theopenhand.window.hand to Program, Installer;
     exports theopenhand.statics.privates to Program, Runtime, Installer;
     opens theopenhand.window.hand to javafx.fxml;
     opens theopenhand.window.graphics.inner to javafx.fxml;
@@ -66,5 +65,4 @@ module Commons {
     opens theopenhand.window.graphics.ribbon.elements to javafx.graphics, javafx.fxml;
     opens theopenhand.window.graphics.commons.ordable to javafx.graphics, javafx.fxml;
     opens theopenhand.window.graphics.commons.ordable.components to javafx.graphics, javafx.fxml;
-    //opens theopenhand to javafx.graphics, javafx.fxml;
 }

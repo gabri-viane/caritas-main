@@ -23,7 +23,7 @@ import theopenhand.commons.events.programm.OpExecutor;
 import theopenhand.runtime.loader.Loader;
 import theopenhand.runtime.loader.SettingsLoader;
 import theopenhand.runtime.loader.folder.PluginFolderHandler;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  *

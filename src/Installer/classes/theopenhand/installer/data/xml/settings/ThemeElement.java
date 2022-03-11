@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.installer.data;
+package theopenhand.installer.data.xml.settings;
 
-import java.io.Serializable;
+import ttt.utils.xml.document.XMLElement;
+import ttt.utils.xml.engine.annotations.Element;
 
 /**
  *
  * @author gabri
  */
-public class Version implements Serializable {
+@Element(Name = "theme", CanHaveTags = false, IgnoreSubElementsOnWrite = true)
+public class ThemeElement extends XMLElement {
 
-    public static final Long serialVersionUID = 3L;
-
-    private Version() {
-
+    public ThemeElement() {
+        super("theme");
     }
 
 }

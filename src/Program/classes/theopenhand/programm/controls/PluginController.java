@@ -24,7 +24,7 @@ import theopenhand.installer.utils.Installer;
 import theopenhand.installer.utils.WebConnection;
 import theopenhand.runtime.loader.Loader;
 import theopenhand.runtime.loader.folder.PluginFolderHandler;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  *

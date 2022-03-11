@@ -26,7 +26,7 @@ import javafx.scene.control.ButtonType;
 import theopenhand.installer.online.update.ProgrammAutoupdate;
 import theopenhand.installer.utils.WebConnection;
 import theopenhand.programm.TheOpenHand;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  *

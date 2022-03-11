@@ -29,7 +29,7 @@ import theopenhand.installer.online.store.PluginStore;
 import theopenhand.installer.utils.WebConnection;
 import theopenhand.installer.utils.WebConnection.DownloadTask;
 import theopenhand.statics.privates.StaticData;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  *

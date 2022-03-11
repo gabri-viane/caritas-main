@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.window.graphics.dialogs;
+package theopenhand.window.graphics.creators;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -37,6 +37,7 @@ import theopenhand.statics.privates.StaticReferencesPvt;
 import theopenhand.window.graphics.commons.PickerDialogCNTRL;
 import theopenhand.window.graphics.commons.ordable.OrdableWindow;
 import theopenhand.window.graphics.commons.ordable.OrdableWindowFactory;
+import static theopenhand.window.hand.MainReference.css_selected;
 
 /**
  *
@@ -52,7 +53,9 @@ public class DialogCreator {
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.initOwner(StaticReferencesPvt.primaryStage);
             Scene dialogScene = new Scene(dc.getParentNode(), dc.getDialogWidth(), dc.getDialogHeight());
-            dialogScene.getStylesheets().add(DialogCreator.class.getResource("/theopenhand/window/resources/sheets/ProgrammStylesheet.css").toExternalForm());
+            if (css_selected != null) {
+                dialogScene.getStylesheets().add(css_selected);
+            }
             dialog.setScene(dialogScene);
             dialog.sizeToScene();
             return dialog;
@@ -76,7 +79,9 @@ public class DialogCreator {
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.initOwner(StaticReferencesPvt.primaryStage);
             Scene dialogScene = new Scene(p, width, height);
-            dialogScene.getStylesheets().add(DialogCreator.class.getResource("/theopenhand/window/resources/sheets/ProgrammStylesheet.css").toExternalForm());
+            if (css_selected != null) {
+                dialogScene.getStylesheets().add(css_selected);
+            }
             dialog.setScene(dialogScene);
             dialog.sizeToScene();
             return dialog;
@@ -100,7 +105,9 @@ public class DialogCreator {
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.initOwner(StaticReferencesPvt.primaryStage);
             Scene dialogScene = new Scene(p, width, height);
-            dialogScene.getStylesheets().add(DialogCreator.class.getResource("/theopenhand/window/resources/sheets/ProgrammStylesheet.css").toExternalForm());
+            if (css_selected != null) {
+                dialogScene.getStylesheets().add(css_selected);
+            }
             dialog.setScene(dialogScene);
             dialog.show();
             dialog.sizeToScene();
@@ -199,14 +206,16 @@ public class DialogCreator {
         }
         Alert a = new Alert(at, title, bts);
         DialogPane dp = a.getDialogPane();
-        dp.getStylesheets().add(DialogCreator.class.getResource("/theopenhand/window/resources/sheets/ProgrammStylesheet.css").toExternalForm());
+        if (css_selected != null) {
+            dp.getStylesheets().add(css_selected);
+        }
         dp.getStyleClass().add("anchor-pane");
         dp.setMinHeight(Region.USE_PREF_SIZE);
         a.setHeaderText(title);
         a.setTitle(title);
-        if (text != null) {
-            a.setContentText(text);
-        }
+        Stage stage = (Stage) dp.getScene().getWindow();
+        stage.getIcons().add(new Image(DialogCreator.class.getResourceAsStream("/theopenhand/window/resources/TheOpenHand-Icona.jpg")));
+        a.setContentText(text);
         if (dialog != null) {
             a.setDialogPane(dialog);
         }

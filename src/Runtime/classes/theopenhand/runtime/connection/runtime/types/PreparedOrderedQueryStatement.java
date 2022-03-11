@@ -32,7 +32,7 @@ import javafx.scene.control.Alert;
 import theopenhand.commons.Pair;
 import theopenhand.commons.connection.runtime.annotations.QueryField;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 import theopenhand.commons.connection.runtime.annotations.QueryCustom;
 import theopenhand.commons.connection.runtime.custom.Clause;
 import theopenhand.commons.connection.runtime.custom.ClauseData;

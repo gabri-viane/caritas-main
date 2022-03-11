@@ -24,7 +24,7 @@ import theopenhand.commons.connection.runtime.annotations.QueryField;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.runtime.Utils;
 import theopenhand.statics.StaticReferences;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  *

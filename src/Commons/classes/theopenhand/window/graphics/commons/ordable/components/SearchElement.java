@@ -42,7 +42,7 @@ import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.events.graphics.ClickListener;
 import theopenhand.commons.interfaces.graphics.ValueHolder;
 import theopenhand.runtime.Utils;
-import theopenhand.window.objects.TextFieldBuilder;
+import theopenhand.window.graphics.creators.ElementCreator;
 
 /**
  *
@@ -97,7 +97,7 @@ public class SearchElement<T extends BindableResult> extends HBox implements Val
         if (type.equals(int.class) || type.equals(Integer.class) || type.equals(BigInteger.class)
                 || type.equals(long.class) || type.equals(Long.class)) {
             optionsCB.getItems().addAll(ClauseData.EQUALS, ClauseData.LEQUALS, ClauseData.MEQUALS, ClauseData.LESS_THAN, ClauseData.MORE_THAN);
-            TextField tf = TextFieldBuilder.buildNumericField();
+            TextField tf = ElementCreator.buildNumericField();
             on_req = () -> {
                 cl.setClauseType(ClauseType.WHERE);
                 cl.setClauseData(optionsCB.getValue());

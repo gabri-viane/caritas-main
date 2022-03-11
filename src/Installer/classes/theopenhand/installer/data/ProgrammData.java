@@ -22,7 +22,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import theopenhand.installer.SetupInit;
 import theopenhand.installer.data.xml.settings.ProgrammElement;
+import theopenhand.installer.data.xml.settings.ThemeElement;
 import theopenhand.statics.StaticReferences;
+import theopenhand.window.hand.MainReference;
 import ttt.utils.xml.document.XMLDocument;
 import ttt.utils.xml.engine.XMLEngine;
 import ttt.utils.xml.engine.interfaces.IXMLElement;
@@ -39,6 +41,8 @@ public class ProgrammData {
     private XMLDocument doc;
     private XMLWriter writer;
 
+    private ThemeElement te;
+
     private ProgrammData() {
         init();
     }
@@ -48,7 +52,7 @@ public class ProgrammData {
         try {
             writer = new XMLWriter(f);
             doc = new XMLDocument(f);
-            XMLEngine eng = new XMLEngine(f, RootElement.class, ProgrammElement.class);
+            XMLEngine eng = new XMLEngine(f, RootElement.class, ProgrammElement.class, ThemeElement.class);
             eng.morph(doc);
             initData();
             StaticReferences.subscribeOnExit(() -> {
@@ -58,8 +62,8 @@ public class ProgrammData {
             Logger.getLogger(ProgrammData.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void flush(){
+
+    public void flush() {
         writer.writeDocument(doc, true);
     }
 
@@ -72,6 +76,7 @@ public class ProgrammData {
 
     private void initData() {
         IXMLElement el = doc.getRoot().getFirstElement("programm");
+        IXMLElement el2 = doc.getRoot().getFirstElement("theme");
         if (el != null) {
             ProgrammElement pe = (ProgrammElement) el;
             //Ho la versione del programma
@@ -86,6 +91,22 @@ public class ProgrammData {
             pe.setVersion(Version.serialVersionUID);
             doc.getRoot().addSubElement(pe);
         }
+        if (el2 != null) {
+            te = (ThemeElement) el2;
+        } else {
+            //Installazione nuova
+            te = new ThemeElement();
+            te.setValue(MainReference.css_selected);
+            doc.getRoot().addSubElement(te);
+        }
+    }
+
+    public void setTheme(String str) {
+        this.te.setValue(str);
+    }
+    
+    public String getTheme(){
+        return te.getValue();
     }
 
 }

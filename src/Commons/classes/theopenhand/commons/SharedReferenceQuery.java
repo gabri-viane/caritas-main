@@ -24,7 +24,7 @@ import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
 import theopenhand.commons.events.programm.FutureCallable;
 import theopenhand.runtime.templates.ReferenceController;
 import theopenhand.runtime.templates.RuntimeReference;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  *

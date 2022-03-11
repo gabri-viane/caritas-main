@@ -35,7 +35,7 @@ import theopenhand.runtime.SubscriptionHandler;
 import theopenhand.runtime.loader.Loader;
 import theopenhand.runtime.templates.RuntimeReference;
 import theopenhand.statics.StaticReferences;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 import theopenhand.window.graphics.ribbon.RibbonFactory;
 
 /**

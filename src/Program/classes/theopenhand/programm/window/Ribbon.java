@@ -15,15 +15,19 @@
  */
 package theopenhand.programm.window;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import theopenhand.commons.Pair;
 import theopenhand.installer.data.ConnectionData;
 import theopenhand.installer.data.ProgrammData;
 import theopenhand.programm.MainRR;
@@ -33,14 +37,17 @@ import theopenhand.programm.window.homepage.HomepageScene;
 import theopenhand.programm.window.plugins.PluginForm;
 import theopenhand.runtime.loader.folder.PluginFolderHandler;
 import theopenhand.statics.StaticReferences;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 import theopenhand.window.graphics.ribbon.RibbonFactory;
+import static theopenhand.window.hand.MainReference.css_selected;
 
 /**
  *
  * @author gabri
  */
 public class Ribbon {
+
+    private final HashMap<String, String> themes = new HashMap<>();
 
     public Ribbon() {
     }
@@ -100,6 +107,38 @@ public class Ribbon {
         pls.setPrefHeight(Region.USE_COMPUTED_SIZE);
         pls.setMinHeight(Region.USE_COMPUTED_SIZE);
         RibbonFactory.createGroup(MainRR.mrr, "Home", "Plugins").addNode(pls);
+
+        Button setTheme = new Button("Cambia tema");
+        setTheme.setOnAction((t) -> {
+            generateKP();
+            cd.showAndWait().ifPresent((r) -> {
+                ProgrammData.getInstance().setTheme(r.getKey());
+            });
+        });
+
+        RibbonFactory.createGroup(MainRR.mrr, "Home", "Impostazioni").addNode(setTheme);
+    }
+    ChoiceDialog<Pair<String, String>> cd;
+
+    public void generateKP() {
+        if (cd == null) {
+            cd = new ChoiceDialog<>();
+            if (css_selected != null) {
+                cd.getDialogPane().getStylesheets().add(css_selected);
+                cd.getDialogPane().getStyleClass().add("anchor-pane");
+            }
+            String th = ProgrammData.getInstance().getTheme();
+            themes.put("Grigio-Giallo", "/theopenhand/programm/resources/sheets/ProgrammStylesheet.css");
+            themes.put("Scuro-Blu", "/theopenhand/programm/resources/sheets/DarkBlueTheme.css");
+            themes.put("Base", null);
+            themes.forEach((t, u) -> {
+                Pair<String, String> p = new Pair<>(u, t);
+                cd.getItems().add(p);
+                if (th == null ? u == null : th.equals(u)) {
+                    cd.setSelectedItem(p);
+                }
+            });
+        }
     }
 
     public static void saveDatabase() {

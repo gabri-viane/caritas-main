@@ -44,13 +44,22 @@ public class Pair<K, V> {
     }
 
     @Override
+    public String toString() {
+        return value.toString();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof Pair) {
             Pair p = (Pair) obj;
             Object k = p.key;
             Object v = p.value;
-            if (k.getClass().equals(key.getClass()) && v.getClass().equals(value.getClass())) {
-                return key.equals(k) && value.equals(v);
+            if (k != null && v != null && key != null && value != null) {
+                if (k.getClass().equals(key.getClass()) && v.getClass().equals(value.getClass())) {
+                    return key.equals(k) && value.equals(v);
+                }
+            } else {
+                return k == key && v == value;
             }
         }
         return false; //To change body of generated methods, choose Tools | Templates.

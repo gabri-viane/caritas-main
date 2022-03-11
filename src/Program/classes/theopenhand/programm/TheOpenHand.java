@@ -23,7 +23,7 @@ import theopenhand.programm.controls.StaticExchange;
 import theopenhand.programm.controls.UpdateControl;
 import theopenhand.programm.window.Ribbon;
 import theopenhand.statics.privates.StaticReferencesPvt;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 import theopenhand.window.hand.MainActivityCTRL;
 import theopenhand.window.hand.MainReference;
 
@@ -41,10 +41,9 @@ public class TheOpenHand extends Application {
         }*/
         PluginStore.getInstance();
         SetupInit.getInstance();
-        ProgrammData.getInstance();
+        ProgrammData instance = ProgrammData.getInstance();
         ConnectionData.getInstance();
-        UpdateControl up = new UpdateControl();
-        up.checkProgramUpdate();
+        MainReference.css_selected = instance.getTheme() != null ? getClass().getResource(instance.getTheme()).toExternalForm() : null;
     }
 
     @Override
@@ -77,6 +76,8 @@ public class TheOpenHand extends Application {
         } else {
             DialogCreator.showAlert(Alert.AlertType.WARNING, "Connessione fallita", "Non è stato possibile stabilire una connessione al database.\nI Plugins e le funzionalità aggiuntive non saranno caricate.", null);
         }
+        UpdateControl up = new UpdateControl();
+        up.checkProgramUpdate();
     }
 
     /**

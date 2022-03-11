@@ -30,7 +30,7 @@ import theopenhand.installer.interfaces.PluginHandler;
 import theopenhand.installer.utils.Installer;
 import theopenhand.installer.utils.WebConnection;
 import theopenhand.statics.StaticReferences;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  *

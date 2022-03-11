@@ -25,7 +25,7 @@ import theopenhand.runtime.connection.runtime.types.PreparedQueryStatement;
 import theopenhand.runtime.connection.runtime.types.StringQueryBuilder;
 import static theopenhand.runtime.Utils.boxPrimitiveClass;
 import static theopenhand.runtime.Utils.isPrimitive;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  *
@@ -78,10 +78,14 @@ public final class ConnectionEngine<C extends BindableResult, T extends ResultHo
                     }
                 }
             } catch (NoSuchMethodException ex) {
-                DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore plugin", "Il plugin corrente contiene un'errore di programmazione, non è perciò possibile usarlo", null);
+                DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore plugin", "Il plugin corrente contiene un'errore di programmazione, non è perciò possibile usarlo.", null);
+                Logger.getLogger(ConnectionEngine.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException ex) {
             Logger.getLogger(ConnectionEngine.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NullPointerException npe) {
+            DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore plugin", "Il plugin corrente contiene un'errore di programmazione, non è stato possibile eseguire l'azione correttamente.", null);
+            Logger.getLogger(ConnectionEngine.class.getName()).log(Level.SEVERE, null, npe);
         }
     }
 
@@ -100,6 +104,7 @@ public final class ConnectionEngine<C extends BindableResult, T extends ResultHo
                     }
                 } catch (NoSuchMethodException ex) {
                     DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore plugin", "Il plugin corrente contiene un'errore di programmazione, non è perciò possibile usarlo", null);
+                    Logger.getLogger(ConnectionEngine.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } catch (SQLException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException ex) {
@@ -116,10 +121,15 @@ public final class ConnectionEngine<C extends BindableResult, T extends ResultHo
             CallableQueryStatement<C> call = queryBuilder.getCallable(id);
             call.execute(assoc);
             instance.addResult(assoc);
-            return call.getLastError();
+            Exception e = call.getLastError();
+            return e;
         } catch (IllegalArgumentException | SecurityException ex) {
             Logger.getLogger(ConnectionEngine.class.getName()).log(Level.SEVERE, null, ex);
             return ex;
+        } catch (NullPointerException npe) {
+            DialogCreator.showAlert(Alert.AlertType.ERROR, "Errore plugin", "Il plugin corrente contiene un'errore di programmazione, non è stato possibile eseguire l'azione correttamente.", null);
+            Logger.getLogger(ConnectionEngine.class.getName()).log(Level.SEVERE, null, npe);
+            return npe;
         }
     }
 

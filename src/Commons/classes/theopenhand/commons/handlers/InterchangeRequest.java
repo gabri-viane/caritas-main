@@ -33,7 +33,7 @@ import theopenhand.commons.events.programm.FutureDialogRequest;
 import theopenhand.commons.events.programm.FutureObjectRequest;
 import theopenhand.commons.events.programm.ValueAcceptListener;
 import theopenhand.commons.interfaces.ExchangeID;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 
 /**
  *

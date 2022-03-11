@@ -21,7 +21,8 @@ import theopenhand.runtime.templates.ReferenceController;
  */
 public class MainReference extends ReferenceController {
 
-    private static final MainReference mr = new MainReference();
+    private static MainReference mr;
+    public static String css_selected = "/theopenhand/programm/resources/sheets/ProgrammStylesheet.css";
 
     private Scene s;
     private MainActivityCTRL rc;
@@ -35,6 +36,9 @@ public class MainReference extends ReferenceController {
      * @return
      */
     public static MainReference getInstance() {
+        if (mr == null) {
+            mr = new MainReference();
+        }
         return mr;
     }
 
@@ -47,7 +51,9 @@ public class MainReference extends ReferenceController {
             MainActivityCTRL controller = loader.getController();
 
             this.s = new Scene(root);
-            s.getStylesheets().add(getClass().getResource("/theopenhand/window/resources/sheets/ProgrammStylesheet.css").toExternalForm());
+            if (css_selected != null) {
+                s.getStylesheets().add(css_selected);
+            }
             rc = controller;
         } catch (IOException ex) {
             Logger.getLogger(MainReference.class.getName()).log(Level.SEVERE, null, ex);

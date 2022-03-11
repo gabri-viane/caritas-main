@@ -26,7 +26,7 @@ import theopenhand.installer.data.xml.connection.AddressElement;
 import theopenhand.installer.data.xml.connection.CredentialsElement;
 import theopenhand.installer.graphics.ConnectionSetup;
 import theopenhand.statics.StaticReferences;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 import ttt.utils.xml.document.XMLDocument;
 import ttt.utils.xml.engine.XMLEngine;
 import ttt.utils.xml.engine.interfaces.IXMLElement;
@@ -93,7 +93,7 @@ public class ConnectionData {
             if (el == null) {
                 pe = new AddressElement();
                 pe.setPort("3306");
-                pe.setValue("serverTimezone=UTC&enabledTLSProtocols=TLSv1.2");
+                pe.setValue("serverTimezone=UTC&enabledTLSProtocols=TLSv1.2&noAccessToProcedureBodies=true");
                 doc.getRoot().addSubElement(pe);
             } else {
                 pe = (AddressElement) el;

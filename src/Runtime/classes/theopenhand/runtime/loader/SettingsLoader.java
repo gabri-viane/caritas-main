@@ -26,8 +26,8 @@ import theopenhand.runtime.Utils;
 import theopenhand.runtime.block.KeyUnlock;
 import theopenhand.runtime.templates.LinkableClass;
 import theopenhand.runtime.templates.Settings;
-import theopenhand.window.graphics.dialogs.DialogCreator;
-import theopenhand.window.objects.TextFieldBuilder;
+import theopenhand.window.graphics.creators.DialogCreator;
+import theopenhand.window.graphics.creators.ElementCreator;
 import theopenhand.window.resources.ui.settings.plugins.PluginSettingField;
 
 /**
@@ -176,7 +176,7 @@ public class SettingsLoader {
         try {
             LinkableInteger li = (LinkableInteger) f.get(instance);
             TextField tf = new TextField();
-            TextFieldBuilder.transformNumericField(tf);
+            ElementCreator.transformNumericField(tf);
             tf.setPromptText(ann.description());
             tf.textProperty().addListener((ov, t, t1) -> {
                 try {

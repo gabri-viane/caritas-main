@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.window.graphics.dialogs;
+package theopenhand.window.graphics.creators;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.cell.PropertyValueFactory;
 import theopenhand.commons.DataUtils;
 import theopenhand.commons.Pair;
@@ -37,6 +40,32 @@ import theopenhand.window.graphics.inner.DisplayTableValue;
  * @author gabri
  */
 public class ElementCreator {
+
+    /**
+     *
+     * @return
+     */
+    public static TextField buildNumericField() {
+        TextField tf = new TextField();
+        transformNumericField(tf);
+        return tf;
+    }
+
+    /**
+     *
+     * @param tf
+     */
+    public static void transformNumericField(TextField tf) {
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String text = change.getText();
+            if (text.matches("[0-9]*")) {
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+        tf.setTextFormatter(textFormatter);
+    }
 
     private ElementCreator() {
 

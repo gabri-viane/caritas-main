@@ -45,7 +45,7 @@ import theopenhand.commons.interfaces.StringTransformer;
 import theopenhand.commons.interfaces.graphics.DialogComponent;
 import theopenhand.runtime.Utils;
 import theopenhand.runtime.templates.RuntimeReference;
-import theopenhand.window.graphics.dialogs.DialogCreator;
+import theopenhand.window.graphics.creators.DialogCreator;
 import theopenhand.window.graphics.inner.RadioValueButton;
 import theopenhand.window.graphics.inner.SelectableElement;
 
