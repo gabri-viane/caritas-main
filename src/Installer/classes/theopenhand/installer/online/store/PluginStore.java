@@ -29,16 +29,19 @@ import theopenhand.installer.utils.WebConnection;
 public class PluginStore {
 
     private final HashMap<UUID, PluginDownloadData> availables;
+    private final HashMap<UUID, LibraryDownloadData> availables_libs;
     private static PluginStore instance;
     private final WebsiteComplement wc;
 
     private PluginStore() {
         availables = new HashMap<>();
+        availables_libs = new HashMap<>();
         wc = new WebsiteComplement();
     }
 
     public void refresh() {
         availables.clear();
+        availables_libs.clear();
         wc.sendViewRequest(this);
     }
 
@@ -62,14 +65,32 @@ public class PluginStore {
         return availables.get(uid);
     }
 
+    public void addLibrary(LibraryDownloadData ld) {
+        availables_libs.put(ld.getUuid(), ld);
+    }
+
+    public Map<UUID, LibraryDownloadData> getLibraries() {
+        return Collections.unmodifiableMap(availables_libs);
+    }
+
+    public LibraryDownloadData getLibrary(UUID uid) {
+        return availables_libs.get(uid);
+    }
+
     public void retriveDescription(PluginDownloadData pd) {
         if (pd != null) {
             wc.sendDescriptionRequest(pd);
         }
     }
-    
-    public WebConnection.DownloadTask download(PluginDownloadData pd){
-        if(pd!=null){
+
+    public WebConnection.DownloadTask download(PluginDownloadData pd) {
+        if (pd != null) {
+            return wc.sendDownloadRequest(pd);
+        }
+        return null;
+    }
+    public WebConnection.DownloadTask download(LibraryDownloadData pd) {
+        if (pd != null) {
             return wc.sendDownloadRequest(pd);
         }
         return null;

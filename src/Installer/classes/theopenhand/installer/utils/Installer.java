@@ -29,8 +29,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import theopenhand.installer.SetupFolders;
 import theopenhand.installer.SetupInit;
 import theopenhand.installer.interfaces.PluginHandler;
+import theopenhand.installer.online.store.LibraryDownloadData;
 import theopenhand.installer.online.store.PluginDownloadData;
 
 /**
@@ -42,7 +44,7 @@ public class Installer {
     private final File to_install;
     private final PluginHandler pl;
 
-    private Installer(File f,PluginHandler pl) {
+    private Installer(File f, PluginHandler pl) {
         this.to_install = f;
         this.pl = pl;
     }
@@ -53,9 +55,9 @@ public class Installer {
      * @param pl
      * @return
      */
-    public static Installer generate(File f,PluginHandler pl) {
-        if (f != null && f.exists() && f.isFile() && f.canRead() && pl!=null) {
-            return new Installer(f,pl);
+    public static Installer generate(File f, PluginHandler pl) {
+        if (f != null && f.exists() && f.isFile() && f.canRead() && pl != null) {
+            return new Installer(f, pl);
         }
         return null;
     }
@@ -96,11 +98,12 @@ public class Installer {
                 Path newPath = zipSlipProtect(to_extract, SetupInit.getInstance().getPLUGINS_FOLDER().toPath());
                 Files.copy(file.getInputStream(to_extract), newPath, StandardCopyOption.REPLACE_EXISTING);
                 if (pd != null) {
-                    pl.addPluginData(newPath.toFile(), pd.getName(), pd.getInj_point(), pd.getVersion().toString(), pd.getUuid(), pd.getRequires());
+                    pl.addPluginData(newPath.toFile(), pd.getName(), pd.getInj_point(), pd.getVersion().toString(), pd.getUuid(), pd.getRequires(), pd.getLibraries());
                     file.close();
                     return true;
                 }
             }
+            to_install.deleteOnExit();
         } catch (IOException ex) {
             Logger.getLogger(Installer.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -129,7 +132,7 @@ public class Installer {
                 if (!entry.isDirectory()) {
                     var name = entry.getName();
                     if (name.endsWith(".properties")) {
-                        try (InputStream is = file.getInputStream(entry)) {
+                        try ( InputStream is = file.getInputStream(entry)) {
                             p.load(is);
                         } catch (IOException ex) {
                             Logger.getLogger(Installer.class.getName()).log(Level.SEVERE, null, ex);
@@ -149,16 +152,24 @@ public class Installer {
                 String uid = p.getProperty("uuid", null);
                 String ver = p.getProperty("ver", "1");
                 String req = p.getProperty("req");
+                String libs = p.getProperty("libs");
                 ArrayList<UUID> uids = new ArrayList<>();
+                ArrayList<UUID> libs_uids = new ArrayList<>();
                 if (req != null) {
                     String[] reqs = req.split(",");
                     for (String s : reqs) {
                         uids.add(UUID.fromString(s));
                     }
                 }
+                if (libs != null) {
+                    String[] libss = libs.split(",");
+                    for (String s : libss) {
+                        libs_uids.add(UUID.fromString(s));
+                    }
+                }
                 if (pknm != null && injnm != null && !pknm.isBlank() && !injnm.isBlank()) {
                     if (uid != null && !uid.isBlank()) {
-                        pl.addPluginData(newPath.toFile(), pknm, injnm, ver, UUID.fromString(uid), uids);
+                        pl.addPluginData(newPath.toFile(), pknm, injnm, ver, UUID.fromString(uid), uids, libs_uids);
                     } else {
                         pl.addPluginData(newPath.toFile(), pknm, injnm, ver);
                     }
@@ -166,11 +177,30 @@ public class Installer {
                     return true;
                 }
             }
+            to_install.deleteOnExit();
         } catch (IOException ex) {
             Logger.getLogger(Installer.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
         return false;
+    }
+
+    public static ArrayList<File> zipExtract(ZipFile zf, File folder) {
+        ArrayList<File> extracted = new ArrayList<>();
+        try {
+            try (zf) {
+                Iterator<? extends ZipEntry> asIterator = zf.entries().asIterator();
+                while (asIterator.hasNext()) {
+                    ZipEntry entry = asIterator.next();
+                    Path newPath = zipSlipProtect(entry, folder.toPath());
+                    Files.copy(zf.getInputStream(entry), newPath, StandardCopyOption.REPLACE_EXISTING);
+                    extracted.add(newPath.toFile());
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Installer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return extracted;
     }
 
     public static Path zipSlipProtect(ZipEntry zipEntry, Path targetDir) throws IOException {
@@ -180,6 +210,34 @@ public class Installer {
             throw new IOException("Bad zip entry: " + zipEntry.getName());
         }
         return normalizePath;
+    }
+
+    public void installLibraries(LibraryDownloadData ldd) {
+        try {
+            ZipFile zf = new ZipFile(to_install);
+            File lib_f = new File(SetupFolders.PATH_TO_LIBRARIES + File.separatorChar + ldd.getUuid().toString());
+            if (!lib_f.exists()) {
+                lib_f.mkdir();
+                zipExtract(zf, lib_f);
+                if (ldd.getInstall_zip_name() != null) {
+                    File inst_dir = new File(lib_f.getAbsolutePath() + File.separatorChar + "install");
+                    File inst_zip = new File(lib_f.getAbsolutePath() + File.separatorChar + ldd.getInstall_zip_name());
+                    inst_dir.mkdir();
+                    zipExtract(new ZipFile(inst_zip), inst_dir);
+                    inst_zip.delete();
+                }
+                if (ldd.getLink_zip_name() != null) {
+                    File link_dir = new File(lib_f.getAbsolutePath() + File.separatorChar + "link");
+                    File link_zip = new File(lib_f.getAbsolutePath() + File.separatorChar + ldd.getLink_zip_name());
+                    link_dir.mkdir();
+                    zipExtract(new ZipFile(link_zip), link_dir);
+                    link_zip.delete();
+                }
+            }
+            to_install.delete();
+        } catch (IOException ex) {
+            Logger.getLogger(Installer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

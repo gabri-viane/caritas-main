@@ -15,6 +15,7 @@
  */
 package theopenhand.window.graphics.ribbon.elements;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -51,7 +52,9 @@ public class RibbonGroup extends VBox {
     }
 
     public RibbonGroup addNode(Node n) {
-        main.getChildren().add(n);
+        Platform.runLater(() -> {
+            main.getChildren().add(n);
+        });
         return this;
     }
 

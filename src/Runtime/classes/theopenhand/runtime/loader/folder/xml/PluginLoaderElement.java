@@ -56,6 +56,7 @@ import ttt.utils.xml.engine.annotations.Tag;
 public class PluginLoaderElement extends XMLElement {
 
     private final LinkedList<UUID> deps;
+    private final LinkedList<UUID> libs;
 
     @EngineField(FieldType = FieldType.READ_AND_WRITE)
     @Tag(Name = "file")
@@ -82,6 +83,7 @@ public class PluginLoaderElement extends XMLElement {
     public PluginLoaderElement() {
         super("plugin");
         deps = new LinkedList<>();
+        libs = new LinkedList<>();
     }
 
     public PluginLoaderElement(String file_path, String name, String class_path, String version, String uuid) {
@@ -92,6 +94,7 @@ public class PluginLoaderElement extends XMLElement {
         this.plugin_name = name;
         this.version = version;
         deps = new LinkedList<>();
+        libs = new LinkedList<>();
     }
 
     public PluginLoaderElement(String file_path, String name, String class_path, String version, UUID uuid) {
@@ -102,6 +105,7 @@ public class PluginLoaderElement extends XMLElement {
         this.plugin_name = name;
         this.version = version;
         deps = new LinkedList<>();
+        libs = new LinkedList<>();
     }
 
     public String getFile_path() {
@@ -156,8 +160,15 @@ public class PluginLoaderElement extends XMLElement {
     @EngineMethod(MethodType = MethodType.CALC)
     public void generateDependencies() {
         uuid_fl = UUID.fromString(uuid);
-        getElements().forEach(el -> {
+        getElements().stream().filter((t) -> {
+            return t.getName().equals("depends");
+        }).forEach(el -> {
             deps.add(UUID.fromString(el.getValue()));
+        });
+        getElements().stream().filter((t) -> {
+            return t.getName().equals("library");
+        }).forEach(el -> {
+            libs.add(UUID.fromString(el.getValue()));
         });
     }
 
@@ -178,6 +189,26 @@ public class PluginLoaderElement extends XMLElement {
             de.setValue(el.toString());
             addSubElement(de);
             deps.add(el);
+        });
+    }
+
+    public List<UUID> getLibraries() {
+        return Collections.unmodifiableList(libs);
+    }
+
+    public void addLibraries(UUID el) {
+        LibraryElement le = new LibraryElement();
+        le.setValue(el.toString());
+        addSubElement(le);
+        libs.add(el);
+    }
+
+    public void addLibraries(List<UUID> els) {
+        els.forEach(el -> {
+            LibraryElement le = new LibraryElement();
+            le.setValue(el.toString());
+            addSubElement(le);
+            libs.add(el);
         });
     }
 

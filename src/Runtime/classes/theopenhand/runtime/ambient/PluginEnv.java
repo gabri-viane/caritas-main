@@ -17,19 +17,26 @@ package theopenhand.runtime.ambient;
 
 import theopenhand.runtime.ambient.xml.PluginAmbientElement;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import theopenhand.commons.Pair;
+import theopenhand.installer.SetupInit;
+import theopenhand.runtime.ambient.loadables.SerializedData;
 import theopenhand.runtime.ambient.loadables.SettingsFieldLoader;
 import theopenhand.runtime.ambient.xml.SavedDataElement;
 import theopenhand.runtime.ambient.xml.SavedElement;
 import theopenhand.runtime.ambient.xml.SettingField;
 import theopenhand.runtime.ambient.xml.SettingsElement;
 import theopenhand.runtime.annotations.SettingProperty;
+import theopenhand.runtime.block.KeyUnlock;
 import theopenhand.runtime.data.DataElement;
 import theopenhand.runtime.loader.SettingsLoader;
 import ttt.utils.xml.document.XMLDocument;
@@ -47,9 +54,13 @@ public class PluginEnv {
 
     private final XMLDocument written_data;
     private PluginAmbientElement pl;
+    private SavedDataElement savedData;
     private SettingsFieldLoader fields_loader;
     private final File folder;
     private final File settings_file;
+
+    private final HashMap<String, SerializedData> els = new HashMap<>();
+    private final HashMap<String, DataElement> els_link = new HashMap<>();
 
     private SettingsLoader loader;
 
@@ -84,8 +95,9 @@ public class PluginEnv {
 
     private void writeDefaultElements() {
         pl = new PluginAmbientElement();
+        savedData = new SavedDataElement();
         pl.addSubElement(new SettingsElement());
-        pl.addSubElement(new SavedDataElement());
+        pl.addSubElement(savedData);
         written_data.addSubElement(pl);
         writer.writeDocument(written_data, true);
     }
@@ -96,20 +108,79 @@ public class PluginEnv {
                 XMLEngine eng = new XMLEngine(settings_file, PluginAmbientElement.class, SettingsElement.class, SavedDataElement.class, SavedElement.class, SettingField.class);
                 eng.morph(written_data);
                 pl = (PluginAmbientElement) written_data.getRoot();
+                savedData = pl.getSavedData();
             } catch (IOException ex) {
                 Logger.getLogger(PluginEnv.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
+    /**
+     * Salva e serializza un nuovo DataElement: viene salvato in
+     * {@link SetupInit#PLUGINS_DATA_FOLDER} nel folder specifico del plugin e
+     * aggiunto nella lista {@link SavedDataElement} come {@link SavedElement}
+     * nel file "settings.xml" del plugin.
+     *
+     * @param el
+     */
     public void registerData(DataElement el) {
-        SavedDataElement savedData = ((PluginAmbientElement) written_data.getRoot()).getSavedData();
         SavedElement se = new SavedElement();
         se.setPath_to_file(folder.getAbsolutePath() + File.separatorChar + el.getName());
+        se.setValue(el.getName());
         savedData.addSubElement(se);
+        els.put(el.getName(), new SerializedData(se.getPath_to_file(), se.getValue()));
+        try {
+            File f = new File(se.getPath_to_file());
+            if (!f.exists()) {
+                f.createNewFile();
+            }
+            try ( ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f))) {
+                oos.writeObject(el);
+                oos.flush();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(PluginEnv.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(PluginEnv.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public void registerSettingProperty(Field f, SettingProperty sp) {
+    public DataElement getData(String name) {
+        return els_link.get(name);
+    }
+
+    public void removeData(String name) {
+        SerializedData remove = els.remove(name);
+        els_link.remove(name);
+        if (remove != null) {
+            File f = remove.getF();
+            if (f != null && f.exists()) {
+                f.delete();
+                savedData.getElements().stream().filter((t) -> {
+                    SavedElement se = (SavedElement) t;
+                    return se.getValue().equals(name);
+                });
+            }
+        }
+    }
+
+    /**
+     * Carica tutti i DataElements (prende dal file settings.xml e carica tutti
+     * i "ref"(SavedElement) e li ricarica come SerializedData a questo punto li
+     * converte in DataElements (cioè legge il file serializzato e lo
+     * riconverte)) e li salva nelle impostazioni (classe Settings) del plugin.
+     */
+    private void loadDataElements() {
+        savedData.getElements().forEach(sd -> {
+            SavedElement se = (SavedElement) sd;
+            SerializedData sd2 = new SerializedData(se.getPath_to_file(), se.getValue());
+            els.put(sd2.getName(), sd2);
+            els_link.put(sd2.getName(), sd2.load());
+        });
+        loader.getInstance().setDataElements(KeyUnlock.KEY, els_link);
+    }
+
+    private void registerSettingProperty(Field f, SettingProperty sp) {
         SettingField sf = new SettingField();
         sf.setClazz(f.getType().getName());
         sf.setId(sp.id());
@@ -126,7 +197,7 @@ public class PluginEnv {
         writer.writeDocument(written_data, true);
     }
 
-    public void setSetingsLoader(SettingsLoader sl) {
+    public void setSettingsLoader(SettingsLoader sl) {
         loader = sl;
         loader.init();
         fields_loader = new SettingsFieldLoader(this);
@@ -151,6 +222,7 @@ public class PluginEnv {
             }
         }
         loader.createNodes();
+        loadDataElements();
     }
 
     public SettingsLoader getSettingsLoader() {
@@ -164,5 +236,5 @@ public class PluginEnv {
     public PluginAmbientElement getPluginData() {
         return pl;
     }
-
+    
 }

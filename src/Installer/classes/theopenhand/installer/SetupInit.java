@@ -26,12 +26,13 @@ import ttt.utils.xml.io.XMLWriter;
  * @author gabri
  */
 public final class SetupInit {
-    
+
     private static SetupInit instance;
-    
+
     private File MAIN_FOLDER;
     private File LOGS_FOLDER;
     private File DOWN_FOLDER;
+    private File LIBS_FOLDER;
     private File SETTINGS_FOLDER;
     private File GENERAL_SETTINGS;
     private File CONNECTIONS_SETTINGS;
@@ -39,7 +40,7 @@ public final class SetupInit {
     private File PLUGINS_FOLDER;
     private File PLUGINS_DATA_FOLDER;
     private File PLUGINS_XML;
-    
+
     private SetupInit() {
         init();
     }
@@ -54,17 +55,18 @@ public final class SetupInit {
         }
         return instance;
     }
-    
+
     private void init() {
         initGeneral();
         initSettings();
         initPlugins();
     }
-    
+
     private void initGeneral() {
         MAIN_FOLDER = new File(SetupFolders.PATH_TO_DATA);
         LOGS_FOLDER = new File(SetupFolders.PATH_TO_LOGS);
         DOWN_FOLDER = new File(SetupFolders.PATH_TO_DOWNLOADS);
+        LIBS_FOLDER = new File(SetupFolders.PATH_TO_LIBRARIES);
         SETTINGS_FOLDER = new File(SetupFolders.SETTINGS_PATH_FOLDER);
         PLUGINS_FOLDER = new File(SetupFolders.PLUGINS_PATH_FOLDER);
         if (!MAIN_FOLDER.exists() || !MAIN_FOLDER.isDirectory()) {
@@ -73,6 +75,7 @@ public final class SetupInit {
             PLUGINS_FOLDER.mkdir();
             LOGS_FOLDER.mkdir();
             DOWN_FOLDER.mkdir();
+            LIBS_FOLDER.mkdir();
         } else {
             if (!SETTINGS_FOLDER.exists()) {
                 SETTINGS_FOLDER.mkdir();
@@ -86,9 +89,12 @@ public final class SetupInit {
             if (!DOWN_FOLDER.exists()) {
                 DOWN_FOLDER.mkdir();
             }
+            if (!LIBS_FOLDER.exists()) {
+                LIBS_FOLDER.mkdir();
+            }
         }
     }
-    
+
     private void initSettings() {
         CONNECTIONS_SETTINGS = new File(SetupFolders.CONNECTIONS_SETTINGS_PATH_FILE);
         GENERAL_SETTINGS = new File(SetupFolders.GENERAL_SETTINGS_PATH_FILE);
@@ -110,7 +116,7 @@ public final class SetupInit {
             Logger.getLogger(SetupInit.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void initPlugins() {
         PLUGINS_DATA_FOLDER = new File(SetupFolders.PLUGINS_DATA_PATH_FOLDER);
         PLUGINS_XML = new File(SetupFolders.XML_INSTRUCTION_PATH_FILE);
@@ -151,6 +157,14 @@ public final class SetupInit {
      */
     public File getLOGS_FOLDER() {
         return LOGS_FOLDER;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public File getLIBS_FOLDER() {
+        return LIBS_FOLDER;
     }
 
     /**
@@ -200,5 +214,5 @@ public final class SetupInit {
     public File getPLUGINS_XML() {
         return PLUGINS_XML;
     }
-    
+
 }

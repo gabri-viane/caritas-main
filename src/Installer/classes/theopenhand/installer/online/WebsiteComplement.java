@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.Alert;
 import theopenhand.installer.SetupInit;
+import theopenhand.installer.online.store.LibraryDownloadData;
 import theopenhand.installer.online.store.PluginStore;
 import theopenhand.installer.utils.WebConnection;
 import theopenhand.installer.utils.WebConnection.DownloadTask;
@@ -38,11 +39,13 @@ import theopenhand.window.graphics.creators.DialogCreator;
 public class WebsiteComplement {
 
     private static final String VIEW_PLUGIN_STORE = "https://vnl-eng.net/sections/TCE/ncdb/store/store.php?t=1";
+    private static final String VIEW_LIBRARY_STORE = "https://vnl-eng.net/sections/TCE/ncdb/store/store.php?t=4";
     private static final String VIEW_PLUGIN_DESCRIPTION_STORE = "https://vnl-eng.net/sections/TCE/ncdb/store/store.php?t=2&d=";
+    //private static final String VIEW_LIBRARY_DESCRIPTION_STORE = "https://vnl-eng.net/sections/TCE/ncdb/store/store.php?t=5&d=";
     private static final String DOWNLOAD_PLUGIN = "https://vnl-eng.net/sections/TCE/ncdb/store/";
     private static final String VIEW_VERSION_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/program.php?t=4";
     private static final String DOWNLOAD_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/program.php?t=5&d=";
-    private static final String DOWNLOAD_OUTER_HAND = "https://vnl-eng.net/sections/TCE/ncdb/program/";
+    //private static final String DOWNLOAD_OUTER_HAND = "https://vnl-eng.net/sections/TCE/ncdb/program/";
 
     public WebsiteComplement() {
     }
@@ -77,12 +80,37 @@ public class WebsiteComplement {
                             pd.addRequires(UUID.fromString(je.getAsString()));
                         });
                     }
-                    if (jo.has("lib")) {
-                        jo.getAsJsonArray("lib").forEach(je -> {
-                            pd.addLibrary(UUID.fromString(je.getAsString()));
-                        });
+                    if (jo.has("libs")) {
+                        if (jo.isJsonArray()) {
+                            jo.getAsJsonArray("libs").forEach(je -> {
+                                pd.addLibrary(UUID.fromString(je.getAsString()));
+                            });
+                        } else if (jo.get("libs").isJsonPrimitive()) {
+                            pd.addLibrary(UUID.fromString(jo.get("libs").getAsString()));
+                        }
                     }
                     ps.addPlugin(pd);
+                });
+            } else {
+                DialogCreator.showAlert(Alert.AlertType.WARNING, "Connessione fallita", "Impossibile connettersi al Plugin Store.", null);
+            }
+            s = WebConnection.comunicate(VIEW_LIBRARY_STORE, "");
+            if (s != null) {
+                JsonObject arr2 = (JsonObject) JsonParser.parseString(s);
+                arr2.entrySet().forEach(e -> {
+                    JsonObject jo = e.getValue().getAsJsonObject();
+                    LibraryDownloadData ld = new LibraryDownloadData();
+                    ld.setUuid(e.getKey());
+                    ld.setDownload_path(jo.getAsJsonPrimitive("down_path").getAsString());
+                    ld.setZip_path(jo.getAsJsonPrimitive("zip_path").getAsString());
+                    ld.setVersion(jo.getAsJsonPrimitive("ver").getAsInt());
+                    if (jo.has("link")) {
+                        ld.setLink_zip_name(jo.getAsJsonPrimitive("link").getAsString());
+                    }
+                    if (jo.has("install")) {
+                        ld.setInstall_zip_name(jo.getAsJsonPrimitive("install").getAsString());
+                    }
+                    ps.addLibrary(ld);
                 });
             } else {
                 DialogCreator.showAlert(Alert.AlertType.WARNING, "Connessione fallita", "Impossibile connettersi al Plugin Store.", null);
@@ -110,6 +138,10 @@ public class WebsiteComplement {
 
     public DownloadTask sendDownloadRequest(PluginDownloadData pd) {
         return new DownloadTask(DOWNLOAD_PLUGIN + pd.getDownload_path(), pd.getName(), SetupInit.getInstance().getDOWNLOAD_FOLDER());
+    }
+
+    public DownloadTask sendDownloadRequest(LibraryDownloadData pd) {
+        return new DownloadTask(DOWNLOAD_PLUGIN + pd.getDownload_path(), pd.getUuid().toString(), SetupInit.getInstance().getDOWNLOAD_FOLDER());
     }
 
     public DownloadTask sendDownloadReuest(Long programm_version) {

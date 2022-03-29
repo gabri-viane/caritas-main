@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.installer.data;
+package theopenhand.commons.events.programm;
 
-import java.io.Serializable;
+import theopenhand.runtime.templates.Settings;
 
 /**
  *
  * @author gabri
  */
-public class Version implements Serializable {
+public interface DataRequest<T, R, I> {
 
-    public static final Long serialVersionUID = 4L;
+    public T onRequest(Settings st, R data);
 
-    private Version() {
-
-    }
-
+    public T onSubscribe(Settings st, R data, I data2);
 }

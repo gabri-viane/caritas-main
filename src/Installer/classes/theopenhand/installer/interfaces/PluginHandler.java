@@ -24,15 +24,17 @@ import java.util.UUID;
  * @author gabri
  */
 public interface PluginHandler {
-    
+
     public boolean installed(UUID uid);
-    
+
     public void addPluginData(File f, String name, String ver, String path_to_class);
-    
+
     public void addPluginData(File f, String name, String path_to_class, String ver, UUID uid);
-    
+
     public void addPluginData(File f, String name, String path_to_class, String ver, UUID uid, ArrayList<UUID> dependencies);
-    
+
+    public void addPluginData(File f, String name, String path_to_class, String ver, UUID uid, ArrayList<UUID> dependencies, ArrayList<UUID> libraries);
+
     public void removePluginData(UUID uuid);
-    
+
 }

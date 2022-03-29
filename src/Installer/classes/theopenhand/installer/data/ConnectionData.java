@@ -52,7 +52,7 @@ public class ConnectionData {
         try {
             writer = new XMLWriter(f);
             doc = new XMLDocument(f);
-            XMLEngine eng = new XMLEngine(f, RootElement.class, AddressElement.class, CredentialsElement.class);
+            XMLEngine eng = new XMLEngine(f, RootElement.class, /*ProfileElement.class,*/ AddressElement.class, CredentialsElement.class);
             eng.morph(doc);
             initData();
             StaticReferences.subscribeOnExit(() -> {

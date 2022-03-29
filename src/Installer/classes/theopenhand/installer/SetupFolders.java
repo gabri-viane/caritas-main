@@ -36,6 +36,7 @@ public class SetupFolders {
     private static final String CONNECTION_SETTINGS_FILE_NAME = "_c";
     private static final String PLUGINS_SETTINGS_FILE_NAME = "_p";
 
+    private static final String LIBRARIES_FOLDER_NAME = "libs";
     private static final String DOWNLOAD_FOLDER_NAME = "dl";
     private static final String LOGS_FOLDER_NAME = "logs";
 
@@ -51,6 +52,11 @@ public class SetupFolders {
      * Cartella per i download temporanei
      */
     public static final String PATH_TO_DOWNLOADS = PATH_TO_DATA + File.separatorChar + DOWNLOAD_FOLDER_NAME;
+
+    /**
+     * Cartella per i download temporanei
+     */
+    public static final String PATH_TO_LIBRARIES = PATH_TO_DATA + File.separatorChar + LIBRARIES_FOLDER_NAME;
 
     /**
      * *************************** *

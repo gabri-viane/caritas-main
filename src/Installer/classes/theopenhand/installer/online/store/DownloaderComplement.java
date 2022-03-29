@@ -19,6 +19,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -41,6 +44,7 @@ public class DownloaderComplement {
     private final PluginStore ps;
     private final PluginHandler pl;
     HashMap<UUID, PluginDownloadData> to_install = new HashMap<>();
+    HashMap<UUID, LibraryDownloadData> libraries = new HashMap<>();
     private final HBox taskHB;
     private final ProgressBar taskPB;
     private final Label taskLB;
@@ -56,6 +60,7 @@ public class DownloaderComplement {
     public void installRequired(PluginDownloadData pd, FutureCallable<Void> onRefresh) {
         to_install.clear();
         findAllRequired(pd);
+        findLibraries(pd);
         to_install.forEach((t, u) -> {
             WebConnection.DownloadTask dt = ps.download(u);
             dt.setOnSucceeded(e -> {
@@ -63,7 +68,9 @@ public class DownloaderComplement {
             });
             startDownload(dt);
         });
-        final_t.start();
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        executorService.execute(final_t);
+        executorService.shutdown();
     }
 
     private void findAllRequired(PluginDownloadData pd) {
@@ -71,12 +78,25 @@ public class DownloaderComplement {
             PluginDownloadData plugin_to_install = ps.getPlugin(uid);
             if (!pl.installed(uid)) {
                 to_install.put(uid, plugin_to_install);
+                findLibraries(pd);
                 findAllRequired(plugin_to_install);
             }
         });
     }
 
-    private Thread final_t = null;
+    private void findLibraries(PluginDownloadData pd) {
+        pd.getLibraries().forEach(uid -> {
+            LibraryDownloadData lib = ps.getLibrary(uid);
+            libraries.put(uid, lib);
+            WebConnection.DownloadTask dt = ps.download(lib);
+            dt.setOnSucceeded(e -> {
+                onDownloadEnd(dt, lib);
+            });
+            startDownload(dt);
+        });
+    }
+
+    private Task<Void> final_t = null;
     private final ArrayList<FutureCallable<Void>> onrefr = new ArrayList<>();
 
     public void refresh(FutureCallable<Void> onRefresh) {
@@ -84,11 +104,12 @@ public class DownloaderComplement {
             onrefr.add(onRefresh);
         }
         if (final_t == null) {
-            final_t = new Thread() {
+            final_t = new Task<Void>() {
                 @Override
-                public void run() {
+                protected Void call() throws Exception {
                     ps.refresh();
                     onrefr.forEach(t -> t.execute(to_install));
+                    return null;
                 }
             };
         }
@@ -140,7 +161,6 @@ public class DownloaderComplement {
         taskHB.setVisible(true);
         taskPB.progressProperty().bind(dt.progressProperty());
         taskLB.textProperty().bind(dt.messageProperty());
-//        autoInstallHL.setDisable(true);
         Thread td = new Thread(dt);
         td.start();
     }
@@ -152,6 +172,13 @@ public class DownloaderComplement {
 //        autoInstallHL.setDisable(false);
         Installer.generate(dt.getOutput(), pl).installFrom(pd);
         refresh(onRefresh);
+    }
+
+    public void onDownloadEnd(WebConnection.DownloadTask dt, LibraryDownloadData pd) {
+        taskHB.setVisible(false);
+        taskPB.progressProperty().unbind();
+        taskLB.textProperty().unbind();
+        Installer.generate(dt.getOutput(), pl).installLibraries(pd);
     }
 
 }

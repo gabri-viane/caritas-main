@@ -6,13 +6,17 @@
 package theopenhand.runtime.loader;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -24,6 +28,8 @@ import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.events.programm.OpExecutor;
 import theopenhand.commons.events.programm.utils.ListEventListener;
 import theopenhand.installer.SetupInit;
+import theopenhand.installer.online.store.LibraryDownloadData;
+import theopenhand.installer.online.store.PluginStore;
 import theopenhand.runtime.SubscriptionHandler;
 import theopenhand.runtime.ambient.DataEnvironment;
 import theopenhand.runtime.ambient.PluginEnv;
@@ -48,8 +54,10 @@ public class Loader {
 
     private final PluginFolderHandler pfh;
     private final DataEnvironment de;
-    private ClassLoader loader;
+    //private ClassLoader loader;
     private UUID current_UUID;
+
+    private final LinkedHashMap<UUID, ClassLoader> loaders;
 
     private Loader() {
         pfh = PluginFolderHandler.getInstance();
@@ -58,6 +66,7 @@ public class Loader {
         loaded_settings = new HashMap<>();
         loaded_plugins = new HashMap<>();
         loaded_references = new HashMap<>();
+        loaders = new LinkedHashMap<>();
         SubscriptionHandler.addListener(new ListEventListener<RuntimeReference>() {
             @Override
             public void onElementAdded(RuntimeReference element) {
@@ -130,12 +139,15 @@ public class Loader {
                     remove(uuid).onCall();
                 });
             }
+            loaders.remove(uid);
+            System.gc();
             new File(pid.getFile_path()).deleteOnExit();//TODO: Classe che segni che file sono da eliminare al prossimo avvio
             return null;
         };
     }
 
     private void createClassLoader(ArrayList<Pair<File, PluginLoaderElement>> jar_files) {
+        /*
         URL[] arr = new URL[jar_files.size()];
         for (int i = 0; i < arr.length; i++) {
             try {
@@ -144,13 +156,74 @@ public class Loader {
                 Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        loader = URLClassLoader.newInstance(arr, getClass().getClassLoader());
+        loader = URLClassLoader.newInstance(arr, getClass().getClassLoader());*/
+        jar_files.forEach(p -> {
+            try {
+                generateURLs(p.getValue());
+                loaders.put(p.getValue().getUUID(), URLClassLoader.newInstance(new URL[]{p.getKey().toURI().toURL()}, getClass().getClassLoader()));
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+
+    }
+
+    private void generateURLs(PluginLoaderElement ple) {
+        ple.getLibraries().forEach(l -> {
+            findLibsFiles(l);
+        });
+    }
+
+    private void findLibsFiles(UUID uid) {
+        ArrayList<URL> urls = new ArrayList<>();
+        File libs_folder = SetupInit.getInstance().getLIBS_FOLDER();
+        String lib_p = libs_folder.getAbsolutePath() + File.separatorChar + uid.toString();
+        LibraryDownloadData library = PluginStore.getInstance().getLibrary(uid);
+        String lib_first = lib_p + File.separatorChar + "link";
+        String lib_second = lib_p + File.separatorChar + "install";
+        findURLs(urls, lib_first);
+        findURLs(urls, lib_second);
+        urls.forEach(u -> addURL(u));
+    }
+
+    private static final Class[] parameters = new Class[]{URL.class};
+    private static ClassLoader sysloader;
+    private static final Class sysclass = ClassLoader.class;
+
+    public static void addURL(URL u) {
+        if(sysloader == null){
+            sysloader = ClassLoader.getSystemClassLoader();
+        }
+        try {
+            Method method = sysclass.getDeclaredMethod("addURL", parameters);
+            method.setAccessible(true);
+            method.invoke(sysloader, u);
+        } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
+            Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void findURLs(ArrayList<URL> urls, String path) {
+        try {
+            Files.list(new File(path).toPath()).filter((t) -> {
+                return t.toFile().getName().endsWith(".jar");
+            }).forEachOrdered((t) -> {
+                try {
+                    urls.add(t.toUri().toURL());
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+        } catch (IOException ex) {
+            Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void loadPlugin(Pair<File, PluginLoaderElement> p) {
         try {
             PluginLoaderElement pe = p.getValue();
-            Class<?> clazz = Class.forName(pe.getClass_path(), true, loader);
+//            Class<?> clazz = Class.forName(pe.getClass_path(), true, loader);
+            Class<?> clazz = Class.forName(pe.getClass_path(), true, loaders.get(pe.getUUID()));
             Class<? extends LinkableClass> runClass = clazz.asSubclass(LinkableClass.class);
             Constructor<?> ctor = runClass.getConstructor();
             var id = pe.getUUID();
@@ -158,7 +231,7 @@ public class Loader {
             loadClass(ctor, id);
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
             Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
-        }catch(java.lang.IncompatibleClassChangeError ce){
+        } catch (java.lang.IncompatibleClassChangeError ce) {
             PluginFolderHandler.getInstance().removePluginData(p.getValue());
             p.getKey().deleteOnExit();
         }

@@ -34,6 +34,7 @@ import theopenhand.installer.online.update.PluginAutoupdate;
 import theopenhand.runtime.ambient.DataEnvironment;
 import theopenhand.runtime.loader.Loader;
 import theopenhand.runtime.loader.folder.xml.DependsElement;
+import theopenhand.runtime.loader.folder.xml.LibraryElement;
 import theopenhand.runtime.loader.folder.xml.PluginLoaderElement;
 import theopenhand.runtime.loader.folder.xml.PluginsLoaderElement;
 import theopenhand.runtime.templates.LinkableClass;
@@ -59,6 +60,7 @@ public class PluginFolderHandler implements PluginHandler {
     private final ArrayList<PluginLoaderElement> load_order;
 
     private final HashMap<UUID, LinkedList<UUID>> dependes_on;
+    private final HashMap<UUID, LinkedList<UUID>> requires_libs;
     private final ArrayList<UUID> to_update = new ArrayList<>();
 
     private static PluginFolderHandler instance;
@@ -69,6 +71,7 @@ public class PluginFolderHandler implements PluginHandler {
         load_order = new ArrayList<>();
         registered = new HashMap<>();
         dependes_on = new HashMap<>();
+        requires_libs = new HashMap<>();
         init();
         StaticReferences.subscribeOnExit(() -> {
             flush();
@@ -101,7 +104,7 @@ public class PluginFolderHandler implements PluginHandler {
         } else {
             try {
                 XMLReader xmlr = new XMLReader(XML_FILE);
-                XMLEngine engine = new XMLEngine(xmlr, PluginLoaderElement.class, PluginsLoaderElement.class, DependsElement.class);
+                XMLEngine engine = new XMLEngine(xmlr, PluginLoaderElement.class, PluginsLoaderElement.class, DependsElement.class, LibraryElement.class);
                 main_doc = new XMLDocument(XML_FILE);
                 engine.morph(main_doc);
             } catch (IOException ex) {
@@ -149,10 +152,10 @@ public class PluginFolderHandler implements PluginHandler {
         return new Pair(plugin_files, not_found);
     }
 
-    public ArrayList<PluginLoaderElement> getLoadOrder(){
+    public ArrayList<PluginLoaderElement> getLoadOrder() {
         return load_order;
     }
-    
+
     public void reorder(ArrayList<PluginLoaderElement> ple) {
         main_doc.getRoot().getElements().clear();
         main_doc.getRoot().getElements().addAll(ple);
@@ -167,6 +170,19 @@ public class PluginFolderHandler implements PluginHandler {
                 LinkedList<UUID> ll = new LinkedList<>();
                 ll.add(pe.getUUID());
                 dependes_on.put(uid, ll);
+            }
+        }
+    }
+
+    private void registerLibs(PluginLoaderElement pe) {
+        List<UUID> libraries = pe.getLibraries();
+        for (UUID uid : libraries) {
+            if (requires_libs.containsKey(uid)) {
+                requires_libs.get(uid).add(pe.getUUID());
+            } else {
+                LinkedList<UUID> ll = new LinkedList<>();
+                ll.add(pe.getUUID());
+                requires_libs.put(uid, ll);
             }
         }
     }
@@ -212,16 +228,37 @@ public class PluginFolderHandler implements PluginHandler {
      */
     @Override
     public void addPluginData(File f, String name, String path_to_class, String ver, UUID uid, ArrayList<UUID> dependencies) {
+        addPluginData(f, name, path_to_class, ver, uid, dependencies, new ArrayList<>());
+    }
+
+    /**
+     * Aggiunge i dati di un plugin al file {@link SetupInit#PLUGINS_XML}
+     *
+     * @param f
+     * @param name
+     * @param path_to_class
+     * @param ver
+     * @param uid
+     * @param dependencies
+     */
+    @Override
+    public void addPluginData(File f, String name, String path_to_class, String ver, UUID uid, ArrayList<UUID> dependencies, ArrayList<UUID> libraries) {
         if (registered.containsKey(uid)) {
             PluginLoaderElement pl = registered.get(uid);
             pl.setPlugin_name(name);
             pl.setFile_path(f.getAbsolutePath());
             pl.setClass_path(path_to_class);
             pl.setVersion(ver);
-        } else if (f != null && name != null && path_to_class != null && uid != null && dependencies != null) {
+        } else if (f != null && name != null && path_to_class != null && uid != null) {
             PluginLoaderElement pl = new PluginLoaderElement(f.getAbsolutePath(), name, path_to_class, ver, uid);
-            pl.addDependencies(dependencies);
-            registerDeps(pl);
+            if (dependencies != null) {
+                pl.addDependencies(dependencies);
+                registerDeps(pl);
+            }
+            if (libraries != null) {
+                pl.addLibraries(libraries);
+                registerLibs(pl);
+            }
             main_doc.getRoot().addSubElement(pl);
             registered.put(uid, pl);
         }
@@ -248,7 +285,7 @@ public class PluginFolderHandler implements PluginHandler {
         findFirst.ifPresent((t) -> {
             PluginLoaderElement pe = (PluginLoaderElement) t;
             LinkableClass ps = Loader.getInstance().findLinkedClass(uuid);
-            if(ps!=null){
+            if (ps != null) {
                 ps.unload();
             }
             main_doc.getRoot().removeSubElement(pe);

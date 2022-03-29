@@ -15,6 +15,8 @@
  */
 package theopenhand.runtime.ambient.xml;
 
+import java.util.Objects;
+import theopenhand.runtime.data.DataElement;
 import ttt.utils.engines.enums.FieldType;
 import ttt.utils.engines.interfaces.EngineField;
 import ttt.utils.xml.document.XMLElement;
@@ -29,13 +31,13 @@ import ttt.utils.xml.engine.annotations.Tag;
 public class SavedElement extends XMLElement {
 
     @EngineField(FieldType = FieldType.READ_AND_WRITE)
-    @Tag(Name = "path",ValueType = String.class)
+    @Tag(Name = "path", ValueType = String.class)
     private String path_to_file;
-    
+
     public SavedElement() {
         super("ref");
-    }    
-    
+    }
+
     public String getPath_to_file() {
         return path_to_file;
     }
@@ -43,5 +45,22 @@ public class SavedElement extends XMLElement {
     public void setPath_to_file(String path_to_file) {
         this.path_to_file = path_to_file;
     }
-        
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SavedElement se) {
+            return se.path_to_file.equals(path_to_file);
+        } else if (obj instanceof DataElement de) {
+            return de.getName().equals(getValue());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 19 * hash + Objects.hashCode(this.path_to_file);
+        return hash;
+    }
+
 }

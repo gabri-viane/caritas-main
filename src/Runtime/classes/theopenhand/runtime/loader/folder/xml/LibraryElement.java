@@ -13,20 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.installer.data;
+package theopenhand.runtime.loader.folder.xml;
 
-import java.io.Serializable;
+import java.util.UUID;
+import ttt.utils.engines.enums.MethodType;
+import ttt.utils.engines.interfaces.EngineMethod;
+import ttt.utils.xml.document.XMLElement;
+import ttt.utils.xml.engine.annotations.Element;
 
 /**
  *
  * @author gabri
  */
-public class Version implements Serializable {
+@Element(Name = "library", CanHaveTags = false)
+public class LibraryElement extends XMLElement {
 
-    public static final Long serialVersionUID = 4L;
+    private UUID uuid;
 
-    private Version() {
-
+    public LibraryElement() {
+        super("library");
     }
 
+    @EngineMethod(MethodType = MethodType.CALC)
+    public void calc() {
+        uuid = UUID.fromString(getValue());
+    }
+
+    public UUID getUUID() {
+        return uuid;
+    }
 }

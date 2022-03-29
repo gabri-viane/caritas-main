@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import theopenhand.runtime.data.DataElement;
@@ -34,9 +33,10 @@ public class SerializedData {
     private File f;
     private String name;
     private final boolean proceed;
+    private DataElement de;
 
     public SerializedData(File file, String name) {
-        proceed = file != null && file.exists() && file.isDirectory();
+        proceed = file != null && file.exists() && !file.isDirectory();
         if (proceed) {
             f = file;
             this.name = name;
@@ -52,12 +52,15 @@ public class SerializedData {
     }
 
     public DataElement load() {
+        if (de != null) {
+            return de;
+        }
         if (proceed) {
             try {
-                try (FileInputStream fis = new FileInputStream(f);
-                        ObjectInputStream ois = new ObjectInputStream(fis)) {
+                try ( FileInputStream fis = new FileInputStream(f);  ObjectInputStream ois = new ObjectInputStream(fis)) {
                     Object readObject = ois.readObject();
-                    return new DataElement(name, (Serializable) readObject);
+                    de = (DataElement) readObject;
+                    return de;
                 }
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(SerializedData.class.getName()).log(Level.SEVERE, null, ex);
@@ -66,6 +69,14 @@ public class SerializedData {
             }
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public File getF() {
+        return f;
     }
 
 }
