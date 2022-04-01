@@ -34,11 +34,6 @@ import theopenhand.window.hand.MainReference;
 public class TheOpenHand extends Application {
 
     private void initSetup() {
-        /*try {
-            Runtime.getRuntime().exec(new String[]{"cmd","/c",System.getProperty("user.dir")+File.separatorChar+"app"+File.separatorChar+"NCDB OuterHands.exe"});
-        } catch (IOException ex) {
-            Logger.getLogger(TheOpenHand.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
         PluginStore.getInstance();
         SetupInit.getInstance();
         ProgrammData instance = ProgrammData.getInstance();
@@ -78,6 +73,7 @@ public class TheOpenHand extends Application {
         }
         UpdateControl up = new UpdateControl();
         up.checkProgramUpdate();
+        up.checkOuterHands();
     }
 
     /**

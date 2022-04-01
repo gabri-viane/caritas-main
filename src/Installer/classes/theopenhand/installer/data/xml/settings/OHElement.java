@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package theopenhand.statics.privates;
+package theopenhand.installer.data.xml.settings;
+
+import ttt.utils.xml.document.XMLElement;
+import ttt.utils.xml.engine.annotations.Element;
 
 /**
  *
  * @author gabri
  */
-public class StaticData {
+@Element(Name = "oh")
+public class OHElement extends XMLElement {
 
-    public static final String TEMP_QUERY_NAME = "tmp";
+    public OHElement() {
+        super("oh");
+    }
 
-    public static final String ZIP_UPDATE_PROGRAMM_NAME = "update";
-    
-    public static final String ZIP_UPDATE_OUTER_HANDS_NAME = "oh_update";
 }

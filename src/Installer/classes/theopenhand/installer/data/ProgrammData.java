@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import theopenhand.installer.SetupInit;
+import theopenhand.installer.data.xml.settings.OHElement;
 import theopenhand.installer.data.xml.settings.ProgrammElement;
 import theopenhand.installer.data.xml.settings.ThemeElement;
 import theopenhand.statics.StaticReferences;
@@ -42,6 +43,7 @@ public class ProgrammData {
     private XMLWriter writer;
 
     private ThemeElement te;
+    private OHElement ohe;
 
     private ProgrammData() {
         init();
@@ -52,7 +54,7 @@ public class ProgrammData {
         try {
             writer = new XMLWriter(f);
             doc = new XMLDocument(f);
-            XMLEngine eng = new XMLEngine(f, RootElement.class, ProgrammElement.class, ThemeElement.class);
+            XMLEngine eng = new XMLEngine(f, RootElement.class, ProgrammElement.class, ThemeElement.class, OHElement.class);
             eng.morph(doc);
             initData();
             StaticReferences.subscribeOnExit(() -> {
@@ -77,6 +79,7 @@ public class ProgrammData {
     private void initData() {
         IXMLElement el = doc.getRoot().getFirstElement("programm");
         IXMLElement el2 = doc.getRoot().getFirstElement("theme");
+        IXMLElement el3 = doc.getRoot().getFirstElement("oh");
         if (el != null) {
             ProgrammElement pe = (ProgrammElement) el;
             //Ho la versione del programma
@@ -99,13 +102,20 @@ public class ProgrammData {
             te.setValue(MainReference.css_selected);
             doc.getRoot().addSubElement(te);
         }
+        if (el3 != null) {
+            ohe = (OHElement) el3;
+        }else{
+            ohe = new OHElement();
+            ohe.setValue("0");
+            doc.getRoot().addSubElement(ohe);
+        }
     }
 
     public void setTheme(String str) {
         this.te.setValue(str);
     }
-    
-    public String getTheme(){
+
+    public String getTheme() {
         return te.getValue();
     }
 

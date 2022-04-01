@@ -219,19 +219,21 @@ public class Installer {
             if (!lib_f.exists()) {
                 lib_f.mkdir();
                 zipExtract(zf, lib_f);
-                if (ldd.getInstall_zip_name() != null) {
-                    File inst_dir = new File(lib_f.getAbsolutePath() + File.separatorChar + "install");
-                    File inst_zip = new File(lib_f.getAbsolutePath() + File.separatorChar + ldd.getInstall_zip_name());
-                    inst_dir.mkdir();
-                    zipExtract(new ZipFile(inst_zip), inst_dir);
-                    inst_zip.delete();
-                }
                 if (ldd.getLink_zip_name() != null) {
                     File link_dir = new File(lib_f.getAbsolutePath() + File.separatorChar + "link");
                     File link_zip = new File(lib_f.getAbsolutePath() + File.separatorChar + ldd.getLink_zip_name());
                     link_dir.mkdir();
                     zipExtract(new ZipFile(link_zip), link_dir);
                     link_zip.delete();
+                    OuterHand.getInstance().linkLibrary(link_dir);
+                }
+                if (ldd.getInstall_zip_name() != null) {
+                    File inst_dir = new File(lib_f.getAbsolutePath() + File.separatorChar + "install");
+                    File inst_zip = new File(lib_f.getAbsolutePath() + File.separatorChar + ldd.getInstall_zip_name());
+                    inst_dir.mkdir();
+                    zipExtract(new ZipFile(inst_zip), inst_dir);
+                    inst_zip.delete();
+                    OuterHand.getInstance().installLibrary(inst_dir);
                 }
             }
             to_install.delete();

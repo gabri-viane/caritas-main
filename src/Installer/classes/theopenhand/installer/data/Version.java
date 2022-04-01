@@ -23,7 +23,7 @@ import java.io.Serializable;
  */
 public class Version implements Serializable {
 
-    public static final Long serialVersionUID = 4L;
+    public static final Long serialVersionUID = 5L;
 
     private Version() {
 

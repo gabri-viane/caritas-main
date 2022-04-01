@@ -206,9 +206,7 @@ public class PluginEnv {
             HashMap<String, Pair<Field, SettingProperty>> fields = loader.getFields();
             boolean fl = settingFields.size() != fields.size();
             if (fl) {
-                pl.getSettings().getElements().forEach(el -> {
-                    pl.getSettings().removeSubElement(el);
-                });
+                pl.getSettings().getElements().clear();
                 fields.forEach((t, u) -> {
                     var f = u.getKey();
                     var sf = u.getValue();

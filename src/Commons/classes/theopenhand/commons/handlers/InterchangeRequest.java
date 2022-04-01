@@ -49,7 +49,7 @@ public class InterchangeRequest {
 
     static {
         freed.addListener((o) -> {
-            if (freed.getValue()) {
+            if (freed.getValue() && !queue.isEmpty()) {
                 queue.remove().run();
             }
         });
@@ -136,6 +136,7 @@ public class InterchangeRequest {
                         showDialog.close();
                         freed.setValue(Boolean.TRUE);
                     });
+                    e.onRefresh(true);
                     if (o != null) {
                         e.selectNullable(o);
                     }
@@ -171,6 +172,7 @@ public class InterchangeRequest {
                             showDialog.close();
                             freed.setValue(Boolean.TRUE);
                         });
+                        e.onRefresh(true);
                         if (o != null) {
                             e.selectNullable(o);
                         }
@@ -187,6 +189,10 @@ public class InterchangeRequest {
                 val.onAccept(Optional.empty());
             }
         }
+    }
+
+    public static boolean isAvailable(String request) {
+        return registered.containsKey(request) || registered_r.containsKey(request) || registered_o.containsKey(request);
     }
 
 }

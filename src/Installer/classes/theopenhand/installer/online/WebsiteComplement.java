@@ -45,7 +45,7 @@ public class WebsiteComplement {
     private static final String DOWNLOAD_PLUGIN = "https://vnl-eng.net/sections/TCE/ncdb/store/";
     private static final String VIEW_VERSION_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/program.php?t=4";
     private static final String DOWNLOAD_PROGRAMM = "https://vnl-eng.net/sections/TCE/ncdb/program/program.php?t=5&d=";
-    //private static final String DOWNLOAD_OUTER_HAND = "https://vnl-eng.net/sections/TCE/ncdb/program/";
+    private static final String DOWNLOAD_OUTER_HAND = "https://vnl-eng.net/sections/TCE/ncdb/program/program.php?t=6";
 
     public WebsiteComplement() {
     }
@@ -144,8 +144,12 @@ public class WebsiteComplement {
         return new DownloadTask(DOWNLOAD_PLUGIN + pd.getDownload_path(), pd.getUuid().toString(), SetupInit.getInstance().getDOWNLOAD_FOLDER());
     }
 
-    public DownloadTask sendDownloadReuest(Long programm_version) {
+    public DownloadTask sendDownloadRequest(Long programm_version) {
         return new DownloadTask(DOWNLOAD_PROGRAMM + programm_version, StaticData.ZIP_UPDATE_PROGRAMM_NAME, SetupInit.getInstance().getDOWNLOAD_FOLDER());
+    }
+
+    public DownloadTask sendDownloadRequestOuterHand() {
+        return new DownloadTask(DOWNLOAD_OUTER_HAND, StaticData.ZIP_UPDATE_OUTER_HANDS_NAME, SetupInit.getInstance().getDOWNLOAD_FOLDER());
     }
 
     public long sendVersionRequest() {

@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import theopenhand.installer.online.update.OHAutoupdate;
 import theopenhand.installer.online.update.ProgrammAutoupdate;
 import theopenhand.installer.utils.WebConnection;
 import theopenhand.programm.TheOpenHand;
@@ -61,6 +62,21 @@ public class UpdateControl {
                         Platform.exit();
                     }
                 });
+            });
+            t.start();
+        }
+    }
+
+    public void checkOuterHands() {
+        OHAutoupdate oha = new OHAutoupdate();
+        if (oha.toUpdate()) {
+            WebConnection.DownloadTask du = oha.downloadUpdate();
+            du.setOnSucceeded((t) -> {
+                oha.extract(du);
+            });
+            Thread t = new Thread(du);
+            GUIControl.getInstance().showDownloadTask(du, () -> {
+                oha.extract(du);
             });
             t.start();
         }

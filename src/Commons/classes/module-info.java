@@ -23,6 +23,7 @@ module Commons {
     requires javafx.graphics;
     requires javafx.fxml;
     requires javafx.controls;
+    requires javafx.swing;
     requires java.base;
 
     exports theopenhand.statics;

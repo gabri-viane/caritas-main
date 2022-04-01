@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import theopenhand.installer.SetupInit;
-import theopenhand.installer.data.Version;
 import theopenhand.installer.online.WebsiteComplement;
 import theopenhand.installer.utils.Installer;
 import theopenhand.installer.utils.WebConnection;
@@ -35,55 +34,47 @@ import theopenhand.installer.utils.WebConnection;
  *
  * @author gabri
  */
-public final class ProgrammAutoupdate {
+public class OHAutoupdate {
 
     private final WebsiteComplement wc;
-    private long online_version;
 
-    public ProgrammAutoupdate() {
-        wc = new WebsiteComplement();
-        refreshData();
-    }
-
-    public void refreshData() {
-        online_version = wc.sendVersionRequest();
-    }
-
-    public Long getVersion() {
-        return Version.serialVersionUID;
+    public OHAutoupdate() {
+        this.wc = new WebsiteComplement();
     }
 
     public boolean toUpdate() {
-        return (Version.serialVersionUID < online_version);
+        String path = SetupInit.getInstance().getLIBS_FOLDER().getAbsolutePath() + File.separatorChar + "NCDB OuterHands.exe";
+        File f = new File(path);
+        return (!f.exists() || !f.isFile());
     }
 
     public WebConnection.DownloadTask downloadUpdate() {
-        return wc.sendDownloadRequest(online_version);
+        return wc.sendDownloadRequestOuterHand();
     }
 
     public File extract(WebConnection.DownloadTask dt) {
         File output = dt.getOutput();
         if (output.exists()) {
-            try (ZipFile zf = new ZipFile(output)) {
+            try ( ZipFile zf = new ZipFile(output)) {
                 ZipEntry update = null;
                 int size = zf.size();
                 if (size == 2) { //Uno file versione l'altro l'aggiornamento
                     Enumeration<? extends ZipEntry> it = zf.entries();
                     while (it.hasMoreElements()) {
                         ZipEntry nextElement = it.nextElement();
-                        if (!nextElement.getName().equals(".version")) {
+                        if (!nextElement.getName().equals(".properties")) {
                             update = nextElement;
                             break;
                         }
                     }
                     if (update != null) {
-                        Path newPath = Installer.zipSlipProtect(update, SetupInit.getInstance().getDOWNLOAD_FOLDER().toPath());
+                        Path newPath = Installer.zipSlipProtect(update, SetupInit.getInstance().getLIBS_FOLDER().toPath());
                         Files.copy(zf.getInputStream(update), newPath, StandardCopyOption.REPLACE_EXISTING);
                         output = newPath.toFile();
                     }
                 }
             } catch (IOException ex) {
-                Logger.getLogger(ProgrammAutoupdate.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(OHAutoupdate.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return output;
