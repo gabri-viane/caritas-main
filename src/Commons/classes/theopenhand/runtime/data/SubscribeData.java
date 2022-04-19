@@ -15,10 +15,8 @@
  */
 package theopenhand.runtime.data;
 
-import java.io.File;
-import java.io.Serializable;
-import java.util.zip.ZipFile;
-import theopenhand.commons.events.programm.DataRequest;
+import theopenhand.commons.events.programm.FutureRequest;
+import theopenhand.runtime.block.KeyUnlock;
 import theopenhand.runtime.templates.Settings;
 
 /**
@@ -27,58 +25,20 @@ import theopenhand.runtime.templates.Settings;
  */
 public class SubscribeData {
 
-    public static DataRequest<File, String, File> file_handler;
-    public static DataRequest<DataElement, String, Serializable> data_handler;
-    public static DataRequest<Void, ZipFile, String> extraction_handler;
+    private static FutureRequest<PluginEnvironmentHandler,Settings> accept;
 
     private SubscribeData() {
 
     }
 
-    public static void setFCFiles(DataRequest<File, String, File> fc) {
-        SubscribeData.file_handler = fc;
-    }
-
-    public static void setFCData(DataRequest<DataElement, String, Serializable> fc) {
-        SubscribeData.data_handler = fc;
-    }
-
-    public static void setFCExtraction(DataRequest<Void, ZipFile, String> fc) {
-        SubscribeData.extraction_handler = fc;
-    }
-
-    public static File generateFile(Settings st, String name, File f) {
-        if (file_handler != null) {
-            return file_handler.onSubscribe(st, name, f);
-        }
-        return null;
-    }
-
-    public static DataElement generateElement(Settings st, String name, Serializable s) {
-        if (data_handler != null) {
-            return data_handler.onSubscribe(st, name, s);
-        }
-        return null;
-    }
-
-    public static void extractFiles(Settings st, ZipFile zf, String name) {
-        if (extraction_handler != null) {
-            extraction_handler.onSubscribe(st, zf, name);
+    public static void setAccept(FutureRequest<PluginEnvironmentHandler,Settings> accept, KeyUnlock key) {
+        if (key != null) {
+            SubscribeData.accept = accept;
         }
     }
 
-    public static File requestFile(Settings st, String name) {
-        if (file_handler != null) {
-            return file_handler.onRequest(st, name);
-        }
-        return null;
-    }
-
-    public static DataElement requestData(Settings st, String name) {
-        if (data_handler != null) {
-            return data_handler.onRequest(st, name);
-        }
-        return null;
+    public static PluginEnvironmentHandler requestEnv(Settings s) {
+        return accept.requested(s);
     }
 
 }

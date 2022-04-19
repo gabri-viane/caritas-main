@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,8 +32,18 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.control.cell.PropertyValueFactory;
 import theopenhand.commons.DataUtils;
 import theopenhand.commons.Pair;
+import theopenhand.commons.ReferenceQuery;
+import theopenhand.commons.SharedReferenceQuery;
+import theopenhand.commons.connection.runtime.ConnectionExecutor;
+import theopenhand.commons.connection.runtime.custom.Clause;
+import theopenhand.commons.connection.runtime.interfaces.BindableResult;
+import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
+import theopenhand.commons.events.programm.FutureCallable;
+import theopenhand.commons.events.programm.ValueAcceptListener;
 import theopenhand.commons.interfaces.graphics.ColumnData;
 import theopenhand.commons.interfaces.graphics.TableAssoc;
+import theopenhand.window.graphics.commons.ordable.OrdableWindow;
+import theopenhand.window.graphics.commons.ordable.OrdableWindowFactory;
 import theopenhand.window.graphics.inner.DisplayTableValue;
 
 /**
@@ -102,6 +113,30 @@ public class ElementCreator {
             table.addColumn(col);
         });
         return table;
+    }
+
+    public static <T extends BindableResult> OrdableWindow<T> getOrdableControl(ReferenceQuery<T, ? extends ResultHolder<T>> rq, T instance, FutureCallable<Void> fc, FutureCallable<Void> on_exit) {
+        Class<T> cl = rq.getBinded_class();
+        if (cl != null) {
+            OrdableWindow<T> generate = OrdableWindowFactory.generate(cl, rq.getQuery_id(), instance);
+            ValueAcceptListener<Optional<ArrayList<Clause>>> on_order = (value) -> {
+                if (value.isPresent()) {
+                    Optional<ResultHolder> requestOrderQuery = ConnectionExecutor.getInstance().requestOrderQuery(rq, instance, value.get());
+                    if (fc != null) {
+                        fc.execute(requestOrderQuery);
+                    }
+                }
+            };
+            generate.onAcceptPressed(() -> {
+                on_order.onAccept(Optional.of(generate.generateClauses()));
+            });
+            generate.onExitPressed(() -> {
+                on_order.onAccept(Optional.empty());
+                on_exit.execute();
+            });
+            return generate;
+        }
+        return null;
     }
 
     static class PVFExtension<S, T> extends PropertyValueFactory<S, T> {

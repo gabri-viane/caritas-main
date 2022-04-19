@@ -111,7 +111,7 @@ public final class DatabaseConnection {
         } catch (SQLException ex) {
             //TODO : Aggiungi eccezione connessione
             Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
-            DialogCreator.showAlert(Alert.AlertType.ERROR, "Impossibile connettersi", "Non è stato possibile connettersi al database selezionato.\nRicontrollare di essere connessi alla rete o che il server sia acceso.", null);
+            DialogCreator.showAlert(Alert.AlertType.ERROR, "Impossibile connettersi", "Non è stato possibile connettersi al database selezionato.\nRicontrollare di essere connessi alla rete o che il server sia acceso.\n\n" + ex.getMessage(), null);
         } catch (RuntimeException e) {
 
         }

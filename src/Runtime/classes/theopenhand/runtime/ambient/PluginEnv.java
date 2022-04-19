@@ -21,14 +21,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipFile;
 import theopenhand.commons.Pair;
 import theopenhand.installer.SetupInit;
+import theopenhand.installer.utils.Installer;
 import theopenhand.runtime.ambient.loadables.SerializedData;
 import theopenhand.runtime.ambient.loadables.SettingsFieldLoader;
 import theopenhand.runtime.ambient.xml.SavedDataElement;
@@ -37,10 +42,13 @@ import theopenhand.runtime.ambient.xml.SettingField;
 import theopenhand.runtime.ambient.xml.SettingsElement;
 import theopenhand.runtime.annotations.SettingProperty;
 import theopenhand.runtime.block.KeyUnlock;
-import theopenhand.runtime.data.DataElement;
+import theopenhand.runtime.data.PluginEnvironmentHandler;
+import theopenhand.runtime.data.components.DataElement;
+import theopenhand.runtime.data.components.IDataElement;
 import theopenhand.runtime.loader.SettingsLoader;
 import ttt.utils.xml.document.XMLDocument;
 import ttt.utils.xml.engine.XMLEngine;
+import ttt.utils.xml.engine.interfaces.IXMLElement;
 import ttt.utils.xml.io.XMLWriter;
 
 /**
@@ -48,7 +56,7 @@ import ttt.utils.xml.io.XMLWriter;
  *
  * @author gabri
  */
-public class PluginEnv {
+public class PluginEnv implements PluginEnvironmentHandler {
 
     private final XMLWriter writer;
 
@@ -60,7 +68,7 @@ public class PluginEnv {
     private final File settings_file;
 
     private final HashMap<String, SerializedData> els = new HashMap<>();
-    private final HashMap<String, DataElement> els_link = new HashMap<>();
+    private final HashMap<String, IDataElement> els_link = new HashMap<>();
 
     private SettingsLoader loader;
 
@@ -80,7 +88,6 @@ public class PluginEnv {
                 written_data = new XMLDocument(settings_file);
                 writer = new XMLWriter(settings_file);
                 writeDefaultElements();
-                //finalizeElements();
             } else {
                 throw new IllegalArgumentException("Il percorso specificato per il salvataggio dati del plugin non è valido.");
             }
@@ -123,61 +130,15 @@ public class PluginEnv {
      *
      * @param el
      */
-    public void registerData(DataElement el) {
+    private void registerData(IDataElement el) {
         SavedElement se = new SavedElement();
         se.setPath_to_file(folder.getAbsolutePath() + File.separatorChar + el.getName());
         se.setValue(el.getName());
-        savedData.addSubElement(se);
+        if (!els.containsKey(el.getName())) {
+            savedData.addSubElement(se);
+        }
         els.put(el.getName(), new SerializedData(se.getPath_to_file(), se.getValue()));
-        try {
-            File f = new File(se.getPath_to_file());
-            if (!f.exists()) {
-                f.createNewFile();
-            }
-            try ( ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f))) {
-                oos.writeObject(el);
-                oos.flush();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(PluginEnv.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(PluginEnv.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public DataElement getData(String name) {
-        return els_link.get(name);
-    }
-
-    public void removeData(String name) {
-        SerializedData remove = els.remove(name);
-        els_link.remove(name);
-        if (remove != null) {
-            File f = remove.getF();
-            if (f != null && f.exists()) {
-                f.delete();
-                savedData.getElements().stream().filter((t) -> {
-                    SavedElement se = (SavedElement) t;
-                    return se.getValue().equals(name);
-                });
-            }
-        }
-    }
-
-    /**
-     * Carica tutti i DataElements (prende dal file settings.xml e carica tutti
-     * i "ref"(SavedElement) e li ricarica come SerializedData a questo punto li
-     * converte in DataElements (cioè legge il file serializzato e lo
-     * riconverte)) e li salva nelle impostazioni (classe Settings) del plugin.
-     */
-    private void loadDataElements() {
-        savedData.getElements().forEach(sd -> {
-            SavedElement se = (SavedElement) sd;
-            SerializedData sd2 = new SerializedData(se.getPath_to_file(), se.getValue());
-            els.put(sd2.getName(), sd2);
-            els_link.put(sd2.getName(), sd2.load());
-        });
-        loader.getInstance().setDataElements(KeyUnlock.KEY, els_link);
+        els_link.put(el.getName(), el);
     }
 
     private void registerSettingProperty(Field f, SettingProperty sp) {
@@ -193,6 +154,23 @@ public class PluginEnv {
     }
 
     public void saveEnv() {
+        els_link.forEach((name, ide) -> {
+            SerializedData get = els.get(name);
+            File f = get.getFileToSave();
+            try {
+                if (!f.exists()) {
+                    f.createNewFile();
+                }
+                try ( ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f))) {
+                    oos.writeObject(ide);
+                    oos.flush();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(PluginEnv.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(PluginEnv.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
         fields_loader.save();
         writer.writeDocument(written_data, true);
     }
@@ -234,5 +212,90 @@ public class PluginEnv {
     public PluginAmbientElement getPluginData() {
         return pl;
     }
-    
+
+    @Override
+    public File addFile(String name, File source) {
+        try {
+            File to_save = new File(folder.getAbsolutePath() + File.separatorChar + name);
+            Files.copy(source.toPath(), to_save.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            DataElement de = new DataElement(name, source);
+            registerData(de);
+            return to_save;
+        } catch (IOException ex) {
+            Logger.getLogger(DataEnvironment.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    @Override
+    public IDataElement addData(String name, ZipFile source) {
+        ArrayList<File> zipExtract = Installer.zipExtract(source, folder);
+        DataElement refs = new DataElement(name, zipExtract);
+        registerData(refs);
+        return refs;
+    }
+
+    @Override
+    public IDataElement addData(String name, Serializable data) {
+        if (name != null && data != null) {
+            DataElement de = new DataElement(name, data);
+            registerData(de);
+            return de;
+        }
+        return null;
+    }
+
+    @Override
+    public void addData(IDataElement data) {
+        if (data != null) {
+            registerData(data);
+        }
+    }
+
+    @Override
+    public IDataElement getData(String name) {
+        return els_link.get(name);
+    }
+
+    @Override
+    public void removeData(String name) {
+        SerializedData remove = els.remove(name);
+        els_link.remove(name);
+        if (remove != null) {
+            File f = remove.getF();
+            if (f != null && f.exists()) {
+                f.delete();
+                Optional<IXMLElement> findFirst = savedData.getElements().stream().filter((t) -> {
+                    SavedElement se = (SavedElement) t;
+                    return se.getValue().equals(name);
+                }).findFirst();
+                findFirst.ifPresent((t) -> {
+                    savedData.getElements().remove(t);
+                });
+            }
+        }
+    }
+
+    @Override
+    public File getFile(String name) {
+        if (name != null) {
+            return new File(folder.getAbsolutePath() + File.separatorChar + name);
+        }
+        return null;
+    }
+
+    /**
+     * Carica tutti i DataElements (prende dal file settings.xml e carica tutti
+     * i "ref"(SavedElement) e li ricarica come SerializedData a questo punto li
+     * converte in DataElements (cioè legge il file serializzato e lo
+     * riconverte)) e li salva nelle impostazioni (classe Settings) del plugin.
+     */
+    @Override
+    public void loadDataElements() {
+        savedData.getSerializedContent().forEach(sd -> {
+            els.put(sd.getName(), sd);
+            els_link.put(sd.getName(), sd.load());
+        });
+        loader.getInstance().setDataElements(KeyUnlock.KEY, els_link);
+    }
 }

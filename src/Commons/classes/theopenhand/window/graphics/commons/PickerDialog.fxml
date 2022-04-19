@@ -65,9 +65,9 @@
                <bottom>
                   <ButtonBar prefHeight="40.0" BorderPane.alignment="CENTER">
                      <buttons>
-                        <Button fx:id="exitBTN" mnemonicParsing="false" text="Annulla" />
+                        <Button fx:id="exitBTN" cancelButton="true" mnemonicParsing="false" text="Annulla" />
                         <Button fx:id="addBTN" mnemonicParsing="false" text="Aggiungi" />
-                        <Button fx:id="selectBTN" mnemonicParsing="false" text="Seleziona" />
+                        <Button fx:id="selectBTN" defaultButton="true" mnemonicParsing="false" text="Seleziona" />
                      </buttons>
                      <padding>
                         <Insets right="10.0" />

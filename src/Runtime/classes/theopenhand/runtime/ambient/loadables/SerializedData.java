@@ -22,9 +22,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import theopenhand.runtime.data.DataElement;
+import theopenhand.runtime.data.components.IDataElement;
 
 /**
+ * Non è un file!! Viene generato alla lettura del file "settings.xml"
+ * <p>
+ * Contiene il nome e il percorso per il "DataElement", cioè l'oggetto
+ * effettivamente serializzato.
  *
  * @author gabri
  */
@@ -33,12 +37,12 @@ public class SerializedData {
     private File f;
     private String name;
     private final boolean proceed;
-    private DataElement de;
+    private IDataElement de;
 
     public SerializedData(File file, String name) {
         proceed = file != null && file.exists() && !file.isDirectory();
-        if (proceed) {
             f = file;
+        if (proceed) {
             this.name = name;
         }
     }
@@ -47,11 +51,11 @@ public class SerializedData {
         this(new File(path), name);
     }
 
-    public void remove() {
+    public final void remove() {
         f.deleteOnExit();
     }
 
-    public DataElement load() {
+    public final IDataElement load() {
         if (de != null) {
             return de;
         }
@@ -59,7 +63,7 @@ public class SerializedData {
             try {
                 try ( FileInputStream fis = new FileInputStream(f);  ObjectInputStream ois = new ObjectInputStream(fis)) {
                     Object readObject = ois.readObject();
-                    de = (DataElement) readObject;
+                    de = (IDataElement) readObject;
                     return de;
                 }
             } catch (FileNotFoundException ex) {
@@ -71,11 +75,15 @@ public class SerializedData {
         return null;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public File getF() {
+    public final File getF() {
+        return proceed ? f : null;
+    }
+    
+    public final File getFileToSave(){
         return f;
     }
 

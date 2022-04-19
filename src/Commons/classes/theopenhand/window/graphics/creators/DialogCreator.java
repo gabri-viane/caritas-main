@@ -56,6 +56,9 @@ public class DialogCreator {
             if (css_selected != null) {
                 dialogScene.getStylesheets().add(css_selected);
             }
+            dialog.setOnCloseRequest((t) -> {
+                dialogScene.setRoot(new Region());
+            });
             dialog.setScene(dialogScene);
             dialog.sizeToScene();
             return dialog;
@@ -82,6 +85,9 @@ public class DialogCreator {
             if (css_selected != null) {
                 dialogScene.getStylesheets().add(css_selected);
             }
+            dialog.setOnCloseRequest((t) -> {
+                dialogScene.setRoot(new Region());
+            });
             dialog.setScene(dialogScene);
             dialog.sizeToScene();
             return dialog;
@@ -108,6 +114,9 @@ public class DialogCreator {
             if (css_selected != null) {
                 dialogScene.getStylesheets().add(css_selected);
             }
+            dialog.setOnCloseRequest((t) -> {
+                dialogScene.setRoot(new Region());
+            });
             dialog.setScene(dialogScene);
             dialog.show();
             dialog.sizeToScene();
@@ -259,7 +268,6 @@ public class DialogCreator {
         Class<T> cl = rq.getBinded_class();
         if (cl != null) {
             OrdableWindow<T> generate = OrdableWindowFactory.generate(cl, rq.getQuery_id(), instance);
-            generate.trim();
             return showDialog(generate, () -> {
                 on_order.onAccept(Optional.of(generate.generateClauses()));
             }, () -> {

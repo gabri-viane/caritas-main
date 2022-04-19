@@ -31,7 +31,10 @@ public class ClauseFactory {
     }
 
     public static Clause generate(KeyUnlock key, Field f, QueryField qf) {
-        return new Clause(f, qf);
+        if (key != null) {
+            return new Clause(f, qf);
+        }
+        return new Clause();
     }
 
     public static Clause duplicate(Clause cl) {

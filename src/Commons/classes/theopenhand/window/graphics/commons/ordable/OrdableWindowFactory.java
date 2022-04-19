@@ -17,7 +17,9 @@ package theopenhand.window.graphics.commons.ordable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import theopenhand.commons.Pair;
 import theopenhand.commons.connection.runtime.annotations.QueryCustom;
 import theopenhand.commons.connection.runtime.annotations.QueryField;
@@ -53,31 +55,49 @@ public class OrdableWindowFactory {
             OrdableWindow<T> ow = new OrdableWindow<>();
             for (Pair<Clause, QueryCustom> p : cls) {
                 Clause cl_s = p.getKey();
+                Clause tmp;
                 QueryCustom enbls = p.getValue();
                 for (ClauseType ct : enbls.enabled()) {
+                    tmp = ClauseFactory.duplicate(cl_s);
                     switch (ct) {
                         case WHERE -> {
-                            cl_s.setClauseType(ClauseType.WHERE);
-                            ow.addElement(new SearchElement<>(cl_s, p.getValue(), in));
+                            tmp.setClauseType(ClauseType.WHERE);
+                            ow.addElement(new SearchElement<>(tmp, p.getValue(), in));
                         }
                         case ORDER_BY -> {
-                            cl_s.setClauseType(ClauseType.ORDER_BY);
-                            ow.addElement(new OrderElement<>(cl_s, p.getValue()));
+                            tmp.setClauseType(ClauseType.ORDER_BY);
+                            ow.addElement(new OrderElement<>(tmp, p.getValue()));
                         }
                         case GROUP_BY -> {
-                            cl_s.setClauseType(ClauseType.GROUP_BY);
-                            ow.addElement(new GroupElement<>(cl_s, p.getValue()));
+                            tmp.setClauseType(ClauseType.GROUP_BY);
+                            ow.addElement(new GroupElement<>(tmp, p.getValue()));
                         }
                     }
                 }
             }
             saved.putIfAbsent(cl, ow);
+            ow.trim();
             return ow;
         } else {
             OrdableWindow get = saved.get(cl);
             get.setInstance(in);
             return get;
         }
+    }
+
+    public static Map<String, Clause> getFiltrableFields(Class<? extends BindableResult> clbr) {
+        Field[] declaredFields = clbr.getDeclaredFields();
+        HashMap<String, Clause> cls = new HashMap<>();
+        for (Field f : declaredFields) {
+            QueryCustom qc = f.getAnnotation(QueryCustom.class);
+            QueryField qf = f.getAnnotation(QueryField.class);
+            if (qc != null && qf != null) {
+                Clause generate = ClauseFactory.generate(KeyUnlock.KEY, f, qf);
+                generate.setClauseType(ClauseType.WHERE);
+                cls.put(qf.name(), generate);
+            }
+        }
+        return Collections.unmodifiableMap(cls);
     }
 
     private ArrayList<Pair<Clause, QueryCustom>> findClauseFields(Class<? extends BindableResult> clbr) {

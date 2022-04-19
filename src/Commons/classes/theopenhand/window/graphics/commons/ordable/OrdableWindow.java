@@ -75,7 +75,7 @@ public class OrdableWindow<T extends BindableResult> extends AnchorPane implemen
     ArrayList<GroupElement<T>> ges = new ArrayList<>();
 
     ClickListener on_apply = () -> {
-        
+
     };
 
     protected OrdableWindow() {
@@ -144,12 +144,12 @@ public class OrdableWindow<T extends BindableResult> extends AnchorPane implemen
 
     @Override
     public double getDialogWidth() {
-        return getPrefWidth();
+        return getWidth()> 0 ? getWidth(): getPrefWidth();
     }
 
     @Override
     public double getDialogHeight() {
-        return getPrefHeight();
+        return getHeight() > 0 ? getHeight() : getPrefHeight();
     }
 
     @Override
@@ -186,10 +186,9 @@ public class OrdableWindow<T extends BindableResult> extends AnchorPane implemen
     }
 
     protected void setInstance(T in) {
-        ses.forEach(se->{
+        ses.forEach(se -> {
             se.setInstance(in);
         });
     }
-
 
 }

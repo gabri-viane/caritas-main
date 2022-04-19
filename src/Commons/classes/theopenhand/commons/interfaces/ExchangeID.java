@@ -15,16 +15,12 @@
  */
 package theopenhand.commons.interfaces;
 
-import theopenhand.commons.interfaces.graphics.DialogComponent;
-import theopenhand.commons.interfaces.graphics.DialogPicker;
-import theopenhand.commons.interfaces.graphics.ValueHolder;
-
 /**
  *
  * @author gabri
  * @param <T>
  */
-public interface ExchangeID<T> extends ValueHolder<T>, DialogPicker<T>, DialogComponent {
+public interface ExchangeID<T> extends GenericPicker<T> {
 
     /**
      *

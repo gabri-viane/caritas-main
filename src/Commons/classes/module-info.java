@@ -48,6 +48,7 @@ module Commons {
     exports theopenhand.runtime.annotations;
     exports theopenhand.runtime.templates;
     exports theopenhand.runtime.data;
+    exports theopenhand.runtime.data.components;
     exports theopenhand.commons.programm.loader;
 
     exports theopenhand.window.graphics.inner;

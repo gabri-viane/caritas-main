@@ -9,7 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import theopenhand.runtime.block.KeyUnlock;
-import theopenhand.runtime.data.DataElement;
+import theopenhand.runtime.data.components.DataElement;
+import theopenhand.runtime.data.components.IDataElement;
 
 /**
  *
@@ -18,14 +19,14 @@ import theopenhand.runtime.data.DataElement;
 public abstract class Settings {
 
     private UUID uuid;
-    private HashMap<String, DataElement> df4_elements = new HashMap<>();
+    private HashMap<String, IDataElement> df4_elements = new HashMap<>();
 
     /**
      *
      * @param key
      * @param des
      */
-    public final void setDataElements(KeyUnlock key, HashMap<String, DataElement> des) {
+    public final void setDataElements(KeyUnlock key, HashMap<String, IDataElement> des) {
         if (key != null) {
             df4_elements = des;
         }
@@ -59,7 +60,7 @@ public abstract class Settings {
      *
      * @return
      */
-    public final Map<String, DataElement> getDataElements() {
+    public final Map<String, IDataElement> getDataElements() {
         return Collections.unmodifiableMap(df4_elements);
     }
 

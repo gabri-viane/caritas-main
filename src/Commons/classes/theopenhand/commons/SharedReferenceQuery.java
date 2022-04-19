@@ -33,7 +33,7 @@ import theopenhand.window.graphics.creators.DialogCreator;
 public class SharedReferenceQuery {
 
     public static enum EXECUTION_REQUEST {
-        QUERY, CALL, CUSTOM_QUERY
+        QUERY, CALL, CUSTOM_QUERY, FILTER_QUERY
     }
 
     private final HashMap<Class<? extends ReferenceController>, ReferenceController> controllers_pool;
@@ -141,6 +141,12 @@ public class SharedReferenceQuery {
                             }
                         }
                     });
+                }
+                case FILTER_QUERY -> {
+                    Optional<ResultHolder> requestOrderQuery = ConnectionExecutor.getInstance().requestOrderQuery(rq, instance, rq.flushClauses());
+                    if (fc != null) {
+                        fc.execute(requestOrderQuery);
+                    }
                 }
             }
         }

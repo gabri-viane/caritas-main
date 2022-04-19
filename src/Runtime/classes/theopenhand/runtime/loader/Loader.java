@@ -13,7 +13,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -49,10 +48,10 @@ public class Loader {
 
     private final PluginFolderHandler pfh;
     private final DataEnvironment de;
-    //private ClassLoader loader;
+    private ClassLoader loader;
     private UUID current_UUID;
 
-    private final LinkedHashMap<UUID, ClassLoader> loaders;
+//    private final LinkedHashMap<UUID, ClassLoader> loaders;
 
     private Loader() {
         pfh = PluginFolderHandler.getInstance();
@@ -61,7 +60,7 @@ public class Loader {
         loaded_settings = new HashMap<>();
         loaded_plugins = new HashMap<>();
         loaded_references = new HashMap<>();
-        loaders = new LinkedHashMap<>();
+//        loaders = new LinkedHashMap<>();
         SubscriptionHandler.addListener(new ListEventListener<RuntimeReference>() {
             @Override
             public void onElementAdded(RuntimeReference element) {
@@ -134,7 +133,7 @@ public class Loader {
                     remove(uuid).onCall();
                 });
             }
-            loaders.remove(uid);
+//            loaders.remove(uid);
             System.gc();
             new File(pid.getFile_path()).deleteOnExit();//TODO: Classe che segni che file sono da eliminare al prossimo avvio
             return null;
@@ -142,7 +141,7 @@ public class Loader {
     }
 
     private void createClassLoader(ArrayList<Pair<File, PluginLoaderElement>> jar_files) {
-        /*
+        
         URL[] arr = new URL[jar_files.size()];
         for (int i = 0; i < arr.length; i++) {
             try {
@@ -151,22 +150,22 @@ public class Loader {
                 Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        loader = URLClassLoader.newInstance(arr, getClass().getClassLoader());*/
-        jar_files.forEach(p -> {
-            try {
-                loaders.put(p.getValue().getUUID(), URLClassLoader.newInstance(new URL[]{p.getKey().toURI().toURL()}, getClass().getClassLoader()));
-            } catch (MalformedURLException ex) {
-                Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
+        loader = URLClassLoader.newInstance(arr, getClass().getClassLoader());
+//        jar_files.forEach(p -> {
+//            try {
+//                loaders.put(p.getValue().getUUID(), URLClassLoader.newInstance(new URL[]{p.getKey().toURI().toURL()}, getClass().getClassLoader()));
+//            } catch (MalformedURLException ex) {
+//                Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        });
 
     }
 
     private void loadPlugin(Pair<File, PluginLoaderElement> p) {
         try {
             PluginLoaderElement pe = p.getValue();
-//            Class<?> clazz = Class.forName(pe.getClass_path(), true, loader);
-            Class<?> clazz = Class.forName(pe.getClass_path(), true, loaders.get(pe.getUUID()));
+            Class<?> clazz = Class.forName(pe.getClass_path(), true, loader);
+//            Class<?> clazz = Class.forName(pe.getClass_path(), true, loaders.get(pe.getUUID()));
             Class<? extends LinkableClass> runClass = clazz.asSubclass(LinkableClass.class);
             Constructor<?> ctor = runClass.getConstructor();
             var id = pe.getUUID();

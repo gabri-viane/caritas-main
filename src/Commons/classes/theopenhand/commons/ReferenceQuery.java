@@ -15,6 +15,10 @@
  */
 package theopenhand.commons;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import theopenhand.commons.connection.runtime.custom.Clause;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
 import theopenhand.runtime.templates.RuntimeReference;
@@ -31,6 +35,8 @@ public class ReferenceQuery<T extends BindableResult, X extends ResultHolder<T>>
     private Class<T> binded_class;
     private X result_holder;
     private int query_id;
+
+    private ArrayList<Clause> cls;
 
     /**
      *
@@ -114,6 +120,29 @@ public class ReferenceQuery<T extends BindableResult, X extends ResultHolder<T>>
      */
     public int getQuery_id() {
         return query_id;
+    }
+
+    public void subcribeClauses(Clause... clss) {
+        if (cls != null) {
+            cls.clear();
+        }
+        cls = new ArrayList<>();
+        cls.addAll(Arrays.asList(clss));
+    }
+
+    public void subscribeClauses(List<Clause> clss) {
+        if (cls != null) {
+            cls.clear();
+        }
+        cls = new ArrayList<>();
+        cls.addAll(clss);
+    }
+
+    public ArrayList<Clause> flushClauses() {
+        if (cls != null) {
+            return cls;
+        }
+        return new ArrayList<>();
     }
 
 }

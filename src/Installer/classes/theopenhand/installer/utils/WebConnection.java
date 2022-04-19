@@ -25,6 +25,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.concurrent.Task;
 
 /**
@@ -73,7 +75,7 @@ public class WebConnection {
                 //Get Response  
                 InputStream is = connection.getInputStream();
                 StringBuffer response;
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(is))) {
+                try ( BufferedReader rd = new BufferedReader(new InputStreamReader(is))) {
                     response = new StringBuffer();
                     String line;
                     while ((line = rd.readLine()) != null) {
@@ -113,8 +115,7 @@ public class WebConnection {
             URLConnection connection = new URL(url).openConnection();
             long file_length = connection.getContentLengthLong();
             try (
-                    InputStream is = connection.getInputStream();
-                    FileOutputStream fos = new FileOutputStream(output);) {
+                     InputStream is = connection.getInputStream();  FileOutputStream fos = new FileOutputStream(output);) {
 
                 long nread = 0L;
                 byte[] buf = new byte[8192];
@@ -129,6 +130,7 @@ public class WebConnection {
                 fos.close();
                 is.close();
             } catch (Exception e) {
+                Logger.getLogger(WebConnection.class.getName()).log(Level.SEVERE, null, e);
             }
             return null;
         }

@@ -16,7 +16,7 @@
 package theopenhand.runtime.ambient.xml;
 
 import java.util.Objects;
-import theopenhand.runtime.data.DataElement;
+import theopenhand.runtime.data.components.IDataElement;
 import ttt.utils.engines.enums.FieldType;
 import ttt.utils.engines.interfaces.EngineField;
 import ttt.utils.xml.document.XMLElement;
@@ -50,7 +50,7 @@ public class SavedElement extends XMLElement {
     public boolean equals(Object obj) {
         if (obj instanceof SavedElement se) {
             return se.path_to_file.equals(path_to_file);
-        } else if (obj instanceof DataElement de) {
+        } else if (obj instanceof IDataElement de) {
             return de.getName().equals(getValue());
         }
         return false;
