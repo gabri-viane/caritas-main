@@ -1,0 +1,179 @@
+.root{
+    -dark-grey : #646464;
+    -light-grey : #878683;
+    -light-text : #303030;
+    -lighter-text : white;
+    -selected-text : #f4d47c;
+    -selected-border : #444444;
+    -dark-default-text : #006644;
+    -light-default-text : #36b37e;
+    -dark-negate-text : #de350b;
+    -light-negate-text : #ff3333;
+    -warning-text : #ef9c23;
+    -default-text : 14px;
+    -increased-text : 15px;
+}
+
+/*Tab Pane*/
+
+.tab-pane>.tab-header-area>.headers-region{
+    -fx-padding : 0px 10px 0px 10px;
+}
+
+/*Label Tab*/
+
+/*Label Tab selezionata*/
+
+/*Tab*/
+
+
+.tab-pane .button{
+    -fx-border-radius : 4;
+    -fx-font-size : 14px;
+}
+
+.anchor-pane-shadowed{
+    -fx-effect: dropshadow( one-pass-box , black , 10, 0.1 , 0 , 0);
+}
+
+.table-view>.column-header-background, .table-view>.column-header-background>.filler, .table-view>.column-header-background>.nested-column-header>.column-header {
+    -fx-font-size : 14px;
+}
+
+.table-view>.column-header-background>.nested-column-header>.column-header>.label {
+    -fx-background-radius : 5px;
+    -fx-font-size : 14px;
+}
+
+
+.label{
+    -fx-font-size : 14px;
+}
+
+.label.warning{
+    -fx-text-fill : -warning-text;
+}
+
+.window-title.label{
+    -fx-font-size : 24;
+}
+
+.window-subtitle.label{
+    -fx-font-size : 18;
+}
+
+.popup-window-title.label{
+    -fx-font-size : 20;
+}
+
+.window-title-element{
+    -fx-font-size : 24;
+    -fx-font-weight : bolder;
+}
+
+.window-subtitle-element{
+    -fx-font-size : 18;
+    -fx-font-weight : bolder;
+}
+
+
+.password-field, .text-field, .text-area{
+    -fx-border-radius : 5px;
+}
+
+
+.date-picker .date-picker-display-node{
+    -fx-font-size : 14px;
+}
+
+.radio-button .text,.check-box .text{
+    -fx-font-size : 14px;
+}
+
+.radio-button .label{
+    -fx-font-size : 14px;
+}
+
+.choice-box, .combo-box {
+    -fx-border-radius : 5px;
+    -fx-font-size : 14px;
+}
+
+.context-menu {
+    -fx-background-radius : 4px;
+    -fx-border-radius : 4px;
+}
+
+.button{
+    -fx-border-radius : 5px;
+    -fx-font-size : 14px;
+}
+
+/*
+.button:cancel{
+    -fx-text-fill: -dark-negate-text;
+}
+*/
+
+.cancel:hover , .button:cancel:hover{
+    -fx-text-fill: -light-negate-text;
+}
+
+/*
+.button:default{
+    -fx-text-fill: -dark-default-text;
+}
+*/
+.default:hover , .button:default:hover{
+    -fx-text-fill: -light-default-text;
+}
+
+.table-view .table-cell{
+    -fx-font-size : 14px;
+    -fx-padding: 2 0 2 10px;
+}
+
+.table-row-cell:odd{
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+}
+.table-row-cell:even{
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+}
+.menu-button{
+    -fx-border-radius : 5px;
+    -fx-font-size : 14px;
+}
+
+.quit .hyperlink{
+	-fx-text-fill : -dark-negate-text;
+}
+
+.hyperlink{
+    -fx-font-size : 14px;
+}
+
+.dialog-pane:header .header-panel {
+    -fx-effect: dropshadow( one-pass-box , black , 10, 0.1 , 0 , 0);
+}
+
+.h1{
+    -fx-font-size : 34px;
+}
+
+.h2{
+    -fx-font-size : 28px;
+}
+
+.h3{
+    -fx-font-size : 24px;
+}
+
+.h4{
+    -fx-font-size : 18px;
+}
+
+.h5{
+    -fx-font-size : 14px;
+}

@@ -5,11 +5,7 @@
  */
 package theopenhand.runtime.templates;
 
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import theopenhand.commons.connection.runtime.interfaces.ResultHolder;
-import theopenhand.commons.events.graphics.ClickListener;
 
 /**
  *

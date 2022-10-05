@@ -5,6 +5,9 @@
  */
 package theopenhand.programm;
 
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -38,7 +41,16 @@ public class TheOpenHand extends Application {
         SetupInit.getInstance();
         ProgrammData instance = ProgrammData.getInstance();
         ConnectionData.getInstance();
-        MainReference.css_selected = instance.getTheme() != null ? getClass().getResource(instance.getTheme()).toExternalForm() : null;
+        MainReference.css_selected = instance.getTheme() != null ? getClass().getResource(instance.getTheme()).toExternalForm() : "/theopenhand/programm/resources/sheets/DefaultTheme.css";
+        if (instance.getGCTask()) {
+            Timer t = new Timer(true);
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    System.gc();
+                }
+            }, new Date(), 30000);
+        }
     }
 
     @Override

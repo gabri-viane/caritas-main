@@ -16,6 +16,7 @@
 package theopenhand.window.graphics.ribbon;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import theopenhand.runtime.block.KeyUnlock;
 import theopenhand.runtime.templates.RuntimeReference;
@@ -37,7 +38,7 @@ public class RibbonFactory {
         return instance;
     }
 
-    public static RibbonTab retriveTab(String title) {
+    public static synchronized RibbonTab retriveTab(String title) {
         if (getInstance().tabs.containsKey(title)) {
             return getInstance().tabs.get(title);
         }
@@ -47,7 +48,7 @@ public class RibbonFactory {
         return rt;
     }
 
-    public static RibbonGroup createGroup(RuntimeReference rr, RibbonTab rt, String title) {
+    public static synchronized RibbonGroup createGroup(RuntimeReference rr, RibbonTab rt, String title) {
         if (rr != null && rt != null && title != null && !title.isBlank()) {
             RibbonGroup rg = rt.addGroup(rr, title);
             return rg;
@@ -55,14 +56,16 @@ public class RibbonFactory {
         return null;
     }
 
-    public static RibbonGroup createGroup(RuntimeReference rr, String tab_title, String title) {
+    public static synchronized RibbonGroup createGroup(RuntimeReference rr, String tab_title, String title) {
         return createGroup(rr, retriveTab(tab_title), title);
     }
 
-    public static void load(RibbonBar rb) {
+    public static synchronized void load(RibbonBar rb) {
         rb.clear();
-        RibbonFactory.getInstance().tabs_ordered.stream().forEachOrdered(t -> {
-            rb.addTab(t);
-        });
+        Iterator<RibbonTab> iterator = instance.tabs_ordered.iterator();
+        iterator.forEachRemaining(t->rb.addTab(t));
+//        RibbonFactory.getInstance().tabs_ordered.stream().forEachOrdered(t -> {
+//            rb.addTab(t);
+//        });
     }
 }

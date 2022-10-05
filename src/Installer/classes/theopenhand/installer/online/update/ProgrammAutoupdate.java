@@ -28,8 +28,8 @@ import java.util.zip.ZipFile;
 import theopenhand.installer.SetupInit;
 import theopenhand.installer.data.Version;
 import theopenhand.installer.online.WebsiteComplement;
-import theopenhand.installer.utils.Installer;
 import theopenhand.installer.utils.WebConnection;
+import theopenhand.runtime.data.FileUtils;
 
 /**
  *
@@ -64,7 +64,7 @@ public final class ProgrammAutoupdate {
     public File extract(WebConnection.DownloadTask dt) {
         File output = dt.getOutput();
         if (output.exists()) {
-            try (ZipFile zf = new ZipFile(output)) {
+            try ( ZipFile zf = new ZipFile(output)) {
                 ZipEntry update = null;
                 int size = zf.size();
                 if (size == 2) { //Uno file versione l'altro l'aggiornamento
@@ -77,7 +77,7 @@ public final class ProgrammAutoupdate {
                         }
                     }
                     if (update != null) {
-                        Path newPath = Installer.zipSlipProtect(update, SetupInit.getInstance().getDOWNLOAD_FOLDER().toPath());
+                        Path newPath = FileUtils.zipSlipProtect(update, SetupInit.getInstance().getDOWNLOAD_FOLDER().toPath());
                         Files.copy(zf.getInputStream(update), newPath, StandardCopyOption.REPLACE_EXISTING);
                         output = newPath.toFile();
                     }

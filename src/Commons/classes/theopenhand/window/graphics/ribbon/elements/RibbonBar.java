@@ -20,7 +20,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TabPane;
@@ -36,7 +35,7 @@ import theopenhand.runtime.templates.RuntimeReference;
 public class RibbonBar extends AnchorPane {
 
     @FXML
-    private TabPane mainTP;
+    private volatile TabPane mainTP;
 
     HashMap<String, RibbonTab> tabs = new HashMap<>();
 
@@ -59,6 +58,7 @@ public class RibbonBar extends AnchorPane {
         SubscriptionHandler.addListener(new ListEventListener<RuntimeReference>() {
             @Override
             public void onElementAdded(RuntimeReference element) {
+                element.initRibbon();
             }
 
             @Override
@@ -68,7 +68,7 @@ public class RibbonBar extends AnchorPane {
         });
     }
 
-    public RibbonTab addTab(String title) {
+    public synchronized RibbonTab addTab(String title) {
         if (tabs.containsKey(title)) {
             return tabs.get(title);
         } else {
@@ -79,7 +79,7 @@ public class RibbonBar extends AnchorPane {
         }
     }
 
-    public void addTab(RibbonTab rt) {
+    public synchronized void addTab(RibbonTab rt) {
         if (rt != null) {
             tabs.put(rt.getText(), rt);
             mainTP.getTabs().add(rt);

@@ -28,5 +28,10 @@ public class MainRR extends RuntimeReference{
     public MainRR() {
         super("Home");
     }
+
+    @Override
+    public void initRibbon() {
+    
+    }
     
 }

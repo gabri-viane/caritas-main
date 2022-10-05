@@ -16,7 +16,6 @@
 package theopenhand.commons;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import theopenhand.commons.connection.runtime.custom.Clause;
 import theopenhand.commons.connection.runtime.interfaces.BindableResult;
@@ -127,7 +126,10 @@ public class ReferenceQuery<T extends BindableResult, X extends ResultHolder<T>>
             cls.clear();
         }
         cls = new ArrayList<>();
-        cls.addAll(Arrays.asList(clss));
+        //Così non converto un array in lista e  poi non costringo l'array ad iterare e aggiungersi gli elementi
+        for (Clause cl : clss) {
+            cls.add(cl);
+        }
     }
 
     public void subscribeClauses(List<Clause> clss) {

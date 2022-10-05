@@ -27,8 +27,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import theopenhand.installer.SetupInit;
 import theopenhand.installer.online.WebsiteComplement;
-import theopenhand.installer.utils.Installer;
 import theopenhand.installer.utils.WebConnection;
+import theopenhand.runtime.data.FileUtils;
 
 /**
  *
@@ -68,7 +68,7 @@ public class OHAutoupdate {
                         }
                     }
                     if (update != null) {
-                        Path newPath = Installer.zipSlipProtect(update, SetupInit.getInstance().getLIBS_FOLDER().toPath());
+                        Path newPath = FileUtils.zipSlipProtect(update, SetupInit.getInstance().getLIBS_FOLDER().toPath());
                         Files.copy(zf.getInputStream(update), newPath, StandardCopyOption.REPLACE_EXISTING);
                         output = newPath.toFile();
                     }

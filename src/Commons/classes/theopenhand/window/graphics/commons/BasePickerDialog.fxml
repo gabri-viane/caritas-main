@@ -49,9 +49,10 @@
                   </ScrollPane>
                </center>
                <bottom>
-                  <ButtonBar prefHeight="40.0" BorderPane.alignment="CENTER">
+                  <ButtonBar fx:id="barBB" prefHeight="40.0" BorderPane.alignment="CENTER">
                      <buttons>
                         <Button fx:id="exitBTN" cancelButton="true" mnemonicParsing="false" text="Annulla" />
+                        <Button fx:id="actionBTN" mnemonicParsing="false" text="Azione" />
                         <Button fx:id="selectBTN" defaultButton="true" mnemonicParsing="false" text="Seleziona" />
                      </buttons>
                      <padding>

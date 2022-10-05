@@ -27,12 +27,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import theopenhand.commons.events.graphics.ClickListener;
 import theopenhand.commons.events.graphics.ListableContainer;
+import theopenhand.commons.events.programm.FutureCallable;
 import theopenhand.commons.interfaces.GenericPicker;
 import theopenhand.commons.interfaces.StringTransformer;
 import theopenhand.window.graphics.inner.RadioValueButton;
@@ -43,6 +45,12 @@ import theopenhand.window.graphics.inner.SelectableElement;
  * @author gabri
  */
 public final class BasePickerDialogCNTRL<T extends Serializable, R extends ListableContainer<String, T>> extends AnchorPane implements GenericPicker<T> {
+
+    @FXML
+    private Button actionBTN;
+
+    @FXML
+    private ButtonBar barBB;
 
     @FXML
     private VBox contentVB;
@@ -215,6 +223,17 @@ public final class BasePickerDialogCNTRL<T extends Serializable, R extends Lista
      */
     public void setTransformer_text(StringTransformer<T> transformer_text) {
         this.transformer_text = transformer_text;
+    }
+
+    public void setActionButton(String name, FutureCallable<Void> act) {
+        if (name != null && act != null) {
+            actionBTN.setText(name);
+            actionBTN.setOnAction(a -> {
+                act.execute(getValue());
+            });
+        } else {
+            barBB.getButtons().remove(actionBTN);
+        }
     }
 
 }

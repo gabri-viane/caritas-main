@@ -21,9 +21,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 /**
  *
@@ -33,7 +38,16 @@ public class HomepageScene extends AnchorPane {
 
     @FXML
     private ImageView iconGestor;
-    
+
+    @FXML
+    private Button next;
+
+    @FXML
+    private VBox vcont;
+
+    @FXML
+    private VBox firstV;
+
     private static HomepageScene instance;
 
     private HomepageScene() {
@@ -46,8 +60,8 @@ public class HomepageScene extends AnchorPane {
         }
         return instance;
     }
-    
-    private void init(){
+
+    private void init() {
         try {
             FXMLLoader loader = new FXMLLoader();
             URL resource = getClass().getResource("/theopenhand/programm/window/homepage/HomepageScene.fxml");
@@ -59,6 +73,18 @@ public class HomepageScene extends AnchorPane {
             Logger.getLogger(HomepageScene.class.getName()).log(Level.SEVERE, null, ex);
         }
         iconGestor.setImage(new Image(this.getClass().getResourceAsStream("/theopenhand/programm/resources/Home.png")));
+        next.setOnAction(a -> {
+            spiegazione();
+        });
+    }
+
+    private void spiegazione() {
+        vcont.getChildren().remove(firstV);
+        VBox vb = new VBox();
+        Text t = new Text("Prova");
+        t.setFont(Font.font("Arial", FontWeight.THIN, USE_PREF_SIZE));
+        vb.getChildren().add(t);
+        vcont.getChildren().add(vb);
     }
 
 }

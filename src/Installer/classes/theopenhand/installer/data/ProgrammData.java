@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import theopenhand.installer.SetupInit;
+import theopenhand.installer.data.xml.settings.GCElement;
 import theopenhand.installer.data.xml.settings.OHElement;
 import theopenhand.installer.data.xml.settings.ProgrammElement;
 import theopenhand.installer.data.xml.settings.ThemeElement;
@@ -44,6 +45,7 @@ public class ProgrammData {
 
     private ThemeElement te;
     private OHElement ohe;
+    private GCElement gce;
 
     private ProgrammData() {
         init();
@@ -54,7 +56,7 @@ public class ProgrammData {
         try {
             writer = new XMLWriter(f);
             doc = new XMLDocument(f);
-            XMLEngine eng = new XMLEngine(f, RootElement.class, ProgrammElement.class, ThemeElement.class, OHElement.class);
+            XMLEngine eng = new XMLEngine(f, RootElement.class, ProgrammElement.class, ThemeElement.class, OHElement.class, GCElement.class);
             eng.morph(doc);
             initData();
             StaticReferences.subscribeOnExit(() -> {
@@ -80,6 +82,7 @@ public class ProgrammData {
         IXMLElement el = doc.getRoot().getFirstElement("programm");
         IXMLElement el2 = doc.getRoot().getFirstElement("theme");
         IXMLElement el3 = doc.getRoot().getFirstElement("oh");
+        IXMLElement el4 = doc.getRoot().getFirstElement("gc");
         if (el != null) {
             ProgrammElement pe = (ProgrammElement) el;
             //Ho la versione del programma
@@ -104,11 +107,19 @@ public class ProgrammData {
         }
         if (el3 != null) {
             ohe = (OHElement) el3;
-        }else{
+        } else {
             ohe = new OHElement();
             ohe.setValue("0");
             doc.getRoot().addSubElement(ohe);
         }
+        if (el4 != null) {
+            gce = (GCElement) el4;
+        } else {
+            gce = new GCElement();
+            gce.setValue("false");
+            doc.getRoot().addSubElement(gce);
+        }
+
     }
 
     public void setTheme(String str) {
@@ -117,6 +128,15 @@ public class ProgrammData {
 
     public String getTheme() {
         return te.getValue();
+    }
+
+    public void setGCTask(boolean b) {
+        this.gce.setValue(Boolean.toString(b));
+    }
+
+    public boolean getGCTask() {
+        String value = gce.getValue();
+        return value != null && value.equalsIgnoreCase("true");
     }
 
 }

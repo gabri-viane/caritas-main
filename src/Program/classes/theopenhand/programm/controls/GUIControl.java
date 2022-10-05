@@ -139,8 +139,8 @@ public class GUIControl {
 
     public void refreshData() {
         Platform.runLater(() -> {
-            //PluginBinder.loadAll();
             Loader l = StaticExchange.LOADER;
+            //PluginBinder.loadAll();
             RibbonFactory.load(rb);
             StaticExchange.MAC.getPluginSettingsBtn().setOnAction((a) -> StaticReferences.getMainWindowReference().setCenterNode(new PluginForm(l)));
             StaticExchange.MAC.getPluginCounterLB().setText("" + l.getUUIDS().size());

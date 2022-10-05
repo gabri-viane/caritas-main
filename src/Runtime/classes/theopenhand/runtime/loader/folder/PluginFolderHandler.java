@@ -46,6 +46,20 @@ import ttt.utils.xml.io.XMLReader;
 import ttt.utils.xml.io.XMLWriter;
 
 /**
+ * Gestisce la cartella "link" che contiene tutti i plugin e il file XML che
+ * contiene le informazioni di caricamento.
+ * <h3>Singleton</h3>
+ * Esiste una sola instanza di questa classe ed è possibile accedervi tramite il
+ * metodo {@link #getInstance() }. L'instanza viene creata la prima volta che
+ * questo metodo viene chiamato, di partenza non esiste.
+ * <h3>Inizializzazione</h3>
+ * Quando la classe viene instanziata viene letto il file xml che contiene le
+ * informazioni dei plugin e vengono creati i relativi
+ * {@link PluginLoaderElement}
+ * <h3>Uscita</h3>
+ * Questa classe è stottoscritta all'evento di uscita dal programma: alla
+ * chiusura del programma viene chiamato il metodo {@link #flush() }
+ *
  *
  * @author gabri
  */
@@ -79,8 +93,10 @@ public class PluginFolderHandler implements PluginHandler {
     }
 
     /**
+     * Ritorna (e nel caso di prima chiamata la crea) l'instanza di questa
+     * classe.
      *
-     * @return
+     * @return L'instanza unica.
      */
     public static PluginFolderHandler getInstance() {
         if (instance == null) {

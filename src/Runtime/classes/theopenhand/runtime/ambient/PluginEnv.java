@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 import theopenhand.commons.Pair;
 import theopenhand.installer.SetupInit;
-import theopenhand.installer.utils.Installer;
 import theopenhand.runtime.ambient.loadables.SerializedData;
 import theopenhand.runtime.ambient.loadables.SettingsFieldLoader;
 import theopenhand.runtime.ambient.xml.SavedDataElement;
@@ -42,9 +41,12 @@ import theopenhand.runtime.ambient.xml.SettingField;
 import theopenhand.runtime.ambient.xml.SettingsElement;
 import theopenhand.runtime.annotations.SettingProperty;
 import theopenhand.runtime.block.KeyUnlock;
+import theopenhand.runtime.data.FileUtils;
 import theopenhand.runtime.data.PluginEnvironmentHandler;
 import theopenhand.runtime.data.components.DataElement;
 import theopenhand.runtime.data.components.IDataElement;
+import theopenhand.runtime.data.components.ListDataElement;
+import theopenhand.runtime.data.components.MapDataElement;
 import theopenhand.runtime.loader.SettingsLoader;
 import ttt.utils.xml.document.XMLDocument;
 import ttt.utils.xml.engine.XMLEngine;
@@ -213,23 +215,48 @@ public class PluginEnv implements PluginEnvironmentHandler {
         return pl;
     }
 
+    /**
+     * Se viene passato un file zip il file viene decompresso in una nuova
+     * cartella con il nome passato {@code name} e viene creato un
+     * {@link ListDataElement}
+     *
+     * @param name Il nome del {@link DataElement} da serializzare
+     * @param source Il file da copiare nella cartella del plugin
+     * @return Il file copiato (o la cartella nel caso di un file compresso)
+     */
     @Override
     public File addFile(String name, File source) {
-        try {
-            File to_save = new File(folder.getAbsolutePath() + File.separatorChar + name);
-            Files.copy(source.toPath(), to_save.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            DataElement de = new DataElement(name, source);
-            registerData(de);
-            return to_save;
-        } catch (IOException ex) {
-            Logger.getLogger(DataEnvironment.class.getName()).log(Level.SEVERE, null, ex);
+        if (FileUtils.isArchive(source)) {
+            try {
+                File out_folder = new File(folder.getAbsolutePath() + File.separatorChar + name+ "_");
+                out_folder.mkdir();
+                ArrayList<File> zipExtract = FileUtils.zipExtract(new ZipFile(source), out_folder);
+                MapDataElement<String, File> files = new MapDataElement<>(name );
+                zipExtract.forEach(f -> {
+                    files.addElement(f.getName(), f);
+                });
+                registerData(files);
+                return out_folder;
+            } catch (IOException ex) {
+                Logger.getLogger(PluginEnv.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            try {
+                File to_save = new File(folder.getAbsolutePath() + File.separatorChar + name);
+                Files.copy(source.toPath(), to_save.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                DataElement de = new DataElement(name, source);
+                registerData(de);
+                return to_save;
+            } catch (IOException ex) {
+                Logger.getLogger(DataEnvironment.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return null;
     }
 
     @Override
     public IDataElement addData(String name, ZipFile source) {
-        ArrayList<File> zipExtract = Installer.zipExtract(source, folder);
+        ArrayList<File> zipExtract = FileUtils.zipExtract(source, folder);
         DataElement refs = new DataElement(name, zipExtract);
         registerData(refs);
         return refs;
@@ -298,4 +325,5 @@ public class PluginEnv implements PluginEnvironmentHandler {
         });
         loader.getInstance().setDataElements(KeyUnlock.KEY, els_link);
     }
+
 }

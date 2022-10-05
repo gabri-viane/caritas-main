@@ -31,6 +31,8 @@ public abstract class RuntimeReference {
         this.reference_name = ref_name;
     }
 
+    public abstract void initRibbon();
+
     /**
      *
      * @return

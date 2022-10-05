@@ -143,9 +143,9 @@ public class SharedReferenceQuery {
                     });
                 }
                 case FILTER_QUERY -> {
-                    Optional<ResultHolder> requestOrderQuery = ConnectionExecutor.getInstance().requestOrderQuery(rq, instance, rq.flushClauses());
+                    Optional<ResultHolder> requestFilterQuery = ConnectionExecutor.getInstance().requestOrderQuery(rq, instance, rq.flushClauses());
                     if (fc != null) {
-                        fc.execute(requestOrderQuery);
+                        fc.execute(requestFilterQuery);
                     }
                 }
             }

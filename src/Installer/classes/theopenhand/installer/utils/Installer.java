@@ -34,6 +34,8 @@ import theopenhand.installer.SetupInit;
 import theopenhand.installer.interfaces.PluginHandler;
 import theopenhand.installer.online.store.LibraryDownloadData;
 import theopenhand.installer.online.store.PluginDownloadData;
+import static theopenhand.runtime.data.FileUtils.zipExtract;
+import static theopenhand.runtime.data.FileUtils.zipSlipProtect;
 
 /**
  *
@@ -183,33 +185,6 @@ public class Installer {
             return false;
         }
         return false;
-    }
-
-    public static ArrayList<File> zipExtract(ZipFile zf, File folder) {
-        ArrayList<File> extracted = new ArrayList<>();
-        try {
-            try (zf) {
-                Iterator<? extends ZipEntry> asIterator = zf.entries().asIterator();
-                while (asIterator.hasNext()) {
-                    ZipEntry entry = asIterator.next();
-                    Path newPath = zipSlipProtect(entry, folder.toPath());
-                    Files.copy(zf.getInputStream(entry), newPath, StandardCopyOption.REPLACE_EXISTING);
-                    extracted.add(newPath.toFile());
-                }
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Installer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return extracted;
-    }
-
-    public static Path zipSlipProtect(ZipEntry zipEntry, Path targetDir) throws IOException {
-        Path targetDirResolved = targetDir.resolve(zipEntry.getName());
-        Path normalizePath = targetDirResolved.normalize();
-        if (!normalizePath.startsWith(targetDir)) {
-            throw new IOException("Bad zip entry: " + zipEntry.getName());
-        }
-        return normalizePath;
     }
 
     public void installLibraries(LibraryDownloadData ldd) {
